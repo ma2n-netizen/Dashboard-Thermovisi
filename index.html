@@ -529,7 +529,7 @@
               </span>
             </div>
             <p class="text-xs text-slate-400 mt-0.5">
-              PT PLN (Persero) UPT Palembang &amp; UPK Bangka Belitung • Google Spreadsheet <span id="sync-timestamp"
+              PT PLN (Persero) UPT Palembang &amp; UPK Bangka Belitung • <span id="source-mode-label">Database Lokal</span> <span id="sync-timestamp"
                 class="text-emerald-400 font-medium">Memuat...</span>
             </p>
           </div>
@@ -582,7 +582,7 @@
           <a id="sheet-link"
             href="https://docs.google.com/spreadsheets/d/1FkIuiePptGPfLoyEHdZhrWaz_CIp4GxyXYVuZEekAY8/edit?gid=400800348#gid=400800348"
             target="_blank" rel="noopener"
-            class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-1.5 transition">
+            class="hidden px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-1.5 transition">
             <span>📄</span><span id="sheet-link-label">Sheet: THERMO DEAD END</span>
           </a>
           <button id="btn-export-csv"
@@ -590,7 +590,7 @@
             <span>📥</span><span>Export Rekap CSV</span>
           </button>
           <button id="btn-sync"
-            class="px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 flex items-center gap-1.5 shadow-lg shadow-amber-500/25 transition">
+            class="hidden px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 flex items-center gap-1.5 shadow-lg shadow-amber-500/25 transition">
             <span id="sync-icon">🔄</span><span id="sync-text">Sinkronisasi 3 Sheet</span>
           </button>
           <button id="btn-theme-toggle" title="Ganti Tema Cerah PLN / Gelap"
@@ -2434,27 +2434,42 @@
     }
 
     async function loadInitialData() {
+      // 1. Prioritaskan Database Lokal statis (data/rekap_thermo_data.js) — bebas koneksi spreadsheet
       if (window.REKAP_THERMO_DATA) {
         rawPayload = window.REKAP_THERMO_DATA;
         initFromPayload(rawPayload);
       }
-      try {
-        const resp = await fetch("/api/data", { cache: "no-store" });
-        if (resp.ok) {
-          rawPayload = await resp.json();
-          initFromPayload(rawPayload);
-          return;
-        }
-      } catch (_) { }
 
-      try {
-        const livePayload = await fetchLiveFromGoogleSheetsDirect();
-        rawPayload = livePayload;
-        initFromPayload(rawPayload);
-      } catch (err) {
-        if (!rawPayload) {
-          alert("Gagal memuat data dari Google Sheet maupun cache lokal: " + err.message);
-        }
+      // 2. Jika dijalankan melalui server lokal (localhost / 127.0.0.1), cek API lokal & aktifkan tombol sync operator
+      const isLocalServer = location.protocol.startsWith("http") &&
+        (location.hostname === "127.0.0.1" || location.hostname === "localhost");
+      if (isLocalServer) {
+        try {
+          const resp = await fetch("/api/data", { cache: "no-store" });
+          if (resp.ok) {
+            rawPayload = await resp.json();
+            initFromPayload(rawPayload);
+            document.getElementById("btn-sync").classList.remove("hidden");
+            document.getElementById("sheet-link").classList.remove("hidden");
+            return;
+          }
+        } catch (_) { }
+      }
+
+      // 3. Fallback ke file JSON lokal (data/rekap_thermo_data.json) jika bundle JS tidak termuat
+      if (!rawPayload && location.protocol.startsWith("http")) {
+        try {
+          const jsonResp = await fetch("data/rekap_thermo_data.json", { cache: "no-store" });
+          if (jsonResp.ok) {
+            rawPayload = await jsonResp.json();
+            initFromPayload(rawPayload);
+            return;
+          }
+        } catch (_) { }
+      }
+
+      if (!rawPayload) {
+        alert("Database lokal (data/rekap_thermo_data.js) belum tersedia.");
       }
     }
 
@@ -4431,28 +4446,18 @@
       const btn = document.getElementById("btn-sync");
       const txt = document.getElementById("sync-text");
       const icon = document.getElementById("sync-icon");
-      btn.disabled = true; icon.textContent = "⏳"; txt.textContent = "Menyinkronkan 3 Sheet...";
+      btn.disabled = true; icon.textContent = "⏳"; txt.textContent = "Menyinkronkan Database Lokal...";
       try {
-        let syncedViaServer = false;
-        try {
-          const res = await fetch("/api/sync", { method: "POST" });
-          if (res.ok) {
-            const json = await res.json();
-            if (json.ok) {
-              const dataRes = await fetch("/api/data", { cache: "no-store" });
-              rawPayload = await dataRes.json();
-              initFromPayload(rawPayload);
-              syncedViaServer = true;
-            }
-          }
-        } catch (_) { }
-        if (!syncedViaServer) {
-          rawPayload = await fetchLiveFromGoogleSheetsDirect();
-          initFromPayload(rawPayload);
-        }
-        icon.textContent = "✅"; txt.textContent = "3 Sheet Tersinkron Live!";
+        const res = await fetch("/api/sync", { method: "POST" });
+        if (!res.ok) throw new Error("Server lokal tidak aktif.");
+        const json = await res.json();
+        if (!json.ok) throw new Error(json.error || "Sinkronisasi gagal.");
+        const dataRes = await fetch("/api/data", { cache: "no-store" });
+        rawPayload = await dataRes.json();
+        initFromPayload(rawPayload);
+        icon.textContent = "✅"; txt.textContent = "Database Lokal Diperbarui!";
       } catch (err) {
-        alert("Gagal menyinkronkan data dari Google Sheet.\nPastikan koneksi internet aktif.\n\nDetail: " + err.message);
+        alert("Gagal menyinkronkan database lokal.\nPastikan server lokal berjalan.\n\nDetail: " + err.message);
         icon.textContent = "🔄"; txt.textContent = "Sinkronisasi 3 Sheet";
       } finally {
         setTimeout(() => { btn.disabled = false; icon.textContent = "🔄"; txt.textContent = "Sinkronisasi 3 Sheet"; }, 2200);
