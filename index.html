@@ -553,7 +553,7 @@
             </button>
 
             <div id="tab-menu-popover"
-              class="hidden absolute right-0 mt-2 w-80 p-2 rounded-2xl bg-slate-900 border border-slate-700 shadow-2xl z-50 space-y-1.5">
+              class="hidden absolute left-0 mt-2 w-80 max-w-[calc(100vw-2rem)] p-2 rounded-2xl bg-slate-900 border border-slate-700 shadow-2xl z-50 space-y-1.5">
               <div class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">Pilih Modul
                 Dashboard</div>
               <button id="main-tab-de" onclick="switchMainView('de')"
@@ -5785,6 +5785,10 @@
         btnTop.addEventListener("click", (e) => {
           e.stopPropagation();
           if (popFloat) popFloat.classList.add("hidden");
+          const rect = btnTop.getBoundingClientRect();
+          const alignRight = rect.left + 320 > window.innerWidth - 12 && rect.right - 320 >= 12;
+          popTop.style.left = alignRight ? "auto" : "0";
+          popTop.style.right = alignRight ? "0" : "auto";
           popTop.classList.toggle("hidden");
         });
       }
