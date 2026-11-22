@@ -4986,17 +4986,38 @@
             }
           },
           scales: {
-            x: { stacked: true, grid: { color: "rgba(148, 163, 184, 0.1)" }, ticks: { color: "#cbd5e1", font: { size: 10, weight: "600" }, maxRotation: isHoriz ? 0 : 55, minRotation: isHoriz ? 0 : 40 } },
-            y: { stacked: true, beginAtZero: true, grace: "12%", grid: { color: "rgba(148, 163, 184, 0.1)" }, ticks: { color: "#cbd5e1", font: { size: 11, weight: "600" } } }
+            x: { stacked: true, grace: isHoriz ? "18%" : "0%", grid: { color: "rgba(148, 163, 184, 0.1)" }, ticks: { color: "#cbd5e1", font: { size: 10, weight: "600" }, maxRotation: isHoriz ? 0 : 55, minRotation: isHoriz ? 0 : 40 } },
+            y: { stacked: true, beginAtZero: true, grace: isHoriz ? "0%" : "18%", grid: { color: "rgba(148, 163, 184, 0.1)" }, ticks: { color: "#cbd5e1", font: { size: 11, weight: "600" } } }
           },
           plugins: {
             legend: { labels: { color: "#e2e8f0", font: { size: 11, weight: "600" } } },
+            tooltip: {
+              callbacks: {
+                afterBody: (items) => {
+                  if (!items || !items.length) return [];
+                  const d = sliced[items[0].dataIndex];
+                  if (!d) return [];
+                  return [
+                    `─────────────────`,
+                    `Target Titik: ${fmtNum(d.total)}`,
+                    `Realisasi: ${fmtNum(d.upd)} (${d.pctReal.toFixed(1)}%)`,
+                    `Tower Lengkap/Sebagian/Belum: ${d.twLengkap}/${d.twSebagian}/${d.twBelum}`
+                  ];
+                }
+              }
+            },
             datalabels: {
-              display: ctx => sliced.length <= 22 && ctx.datasetIndex === 2,
-              anchor: "end", align: isHoriz ? "right" : "top", offset: 2, font: { size: 10, weight: "700" },
+              display: ctx => ctx.datasetIndex === 2,
+              anchor: "end",
+              align: isHoriz ? "right" : "top",
+              offset: isHoriz ? 4 : 2,
+              rotation: (!isHoriz && sliced.length > 22) ? -55 : 0,
+              clamp: true,
+              font: { size: (!isHoriz && sliced.length > 25) ? 9 : 10, weight: "700" },
               formatter: (_, ctx) => {
                 const d = sliced[ctx.dataIndex];
-                return d ? `${d.pctReal.toFixed(0)}%` : "";
+                if (!d || !d.total) return "";
+                return d.pctReal === 100 || d.pctReal === 0 ? `${d.pctReal.toFixed(0)}%` : `${d.pctReal.toFixed(1)}%`;
               }
             }
           }
