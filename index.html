@@ -1296,6 +1296,36 @@
         </div>
       </section>
 
+      <!-- PETA SPASIAL SPAN MIDSPAN & REPAIR SLEEVE -->
+      <section class="glass-card rounded-2xl p-4 lg:p-5 shadow-xl">
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-800">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 text-[10px] font-extrabold uppercase rounded bg-cyan-500 text-slate-950">PETA
+                SPASIAL SPAN</span>
+              <h3 class="text-sm lg:text-base font-bold text-white">Peta Sebaran Koordinat Span Midspan (MJ) &amp;
+                Repair Sleeve (RS)</h3>
+              <span id="ms-map-count"
+                class="px-2 py-0.5 text-[11px] font-bold rounded-full bg-cyan-500/20 text-cyan-300">0 span</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">Sebaran koordinat span MJ &amp; RS berdasarkan hasil ukur dan
+              prioritas kondisi (klik titik span untuk rincian).</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2.5 text-[11px]">
+            <span class="inline-flex items-center gap-1"><span
+                class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>Baik / Normal</span>
+            <span class="inline-flex items-center gap-1"><span
+                class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>Har / P1–P2</span>
+            <span class="inline-flex items-center gap-1"><span
+                class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>Perbaiki / P0</span>
+            <span class="inline-flex items-center gap-1"><span
+                class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>Belum Uji</span>
+          </div>
+        </div>
+        <div id="ms-map-container" class="w-full rounded-xl overflow-hidden border border-slate-700"
+          style="height: 380px;"></div>
+      </section>
+
       <!-- TABEL 1 MIDSPAN: PER PENGHANTAR -->
       <section class="glass-card rounded-2xl p-4 lg:p-5 shadow-xl">
         <div class="flex flex-wrap items-center justify-between gap-3 pb-3 mb-3 border-b border-slate-800">
@@ -2188,6 +2218,34 @@
         </div>
       </section>
 
+      <!-- PETA SPASIAL REALISASI TOWER & SPAN -->
+      <section class="glass-card rounded-2xl p-5 shadow-xl">
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-800">
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="px-2 py-0.5 text-[10px] font-extrabold uppercase rounded bg-indigo-500 text-white">PETA
+                SPASIAL REALISASI</span>
+              <h3 class="text-sm lg:text-base font-bold text-white">Peta Sebaran Realisasi Tower &amp; Span (C1, MJ &amp;
+                RS)</h3>
+              <span id="rl-map-count"
+                class="px-2 py-0.5 text-[11px] font-bold rounded-full bg-indigo-500/20 text-indigo-300">0 lokasi</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">Menampilkan koordinat tower/span (termasuk koordinat span
+              Midspan &amp; Repair Sleeve) sesuai filter jenis aset, ULTG, penghantar, dan status realisasi.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2.5 text-[11px]">
+            <span class="inline-flex items-center gap-1"><span
+                class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>Sudah Realisasi (100%)</span>
+            <span class="inline-flex items-center gap-1"><span
+                class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>Realisasi Sebagian</span>
+            <span class="inline-flex items-center gap-1"><span
+                class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>Belum Realisasi (0%)</span>
+          </div>
+        </div>
+        <div id="rl-map-container" class="w-full rounded-xl overflow-hidden border border-slate-700"
+          style="height: 400px;"></div>
+      </section>
+
       <!-- TABEL DETAIL REALISASI (PER TOWER / PER PENGHANTAR / PER TITIK) -->
       <section id="section-rl-tables" class="glass-card rounded-2xl p-5 shadow-xl">
         <div class="flex flex-wrap items-center justify-between gap-3 pb-4 mb-4 border-b border-slate-800">
@@ -2459,6 +2517,8 @@
     let chartMsScores = null;
     let chartMsUltg = null;
     let chartMsTopSpans = null;
+    let msLeafletMap = null;
+    let msMapLayerGroup = null;
 
     let chartAnInduk = null;
     let chartAnTrend = null;
@@ -2490,6 +2550,8 @@
     let chartRlUltg = null;
     let chartRlTowerDist = null;
     let chartRlInduk = null;
+    let rlLeafletMap = null;
+    let rlMapLayerGroup = null;
     let currentRlTowerList = [];
     let currentRlIndukList = [];
     let currentRlAssetList = [];
@@ -2596,6 +2658,7 @@
         sheetLink.href = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/edit?gid=${GID_THERMO_MIDSPAN}#gid=${GID_THERMO_MIDSPAN}`;
         sheetLabel.textContent = "Sheet: THERMO MIDSPAN";
         refreshMsView();
+        if (msLeafletMap) setTimeout(() => msLeafletMap.invalidateSize(), 150);
       } else if (view === "anomali") {
         sheetLink.href = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/edit?gid=${GID_THERMOVISI}#gid=${GID_THERMOVISI}`;
         sheetLabel.textContent = "Sheet: THERMOVISI (Anomali)";
@@ -2604,6 +2667,7 @@
         sheetLink.href = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/edit?gid=${GID_THERMO_DEADEND}#gid=${GID_THERMO_DEADEND}`;
         sheetLabel.textContent = "Sheet: DEAD END & MIDSPAN";
         refreshRlView();
+        if (rlLeafletMap) setTimeout(() => rlLeafletMap.invalidateSize(), 150);
       } else {
         sheetLink.href = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/edit?gid=${GID_THERMOVISI}#gid=${GID_THERMOVISI}`;
         sheetLabel.textContent = "Sheet: THERMOVISI";
@@ -3389,19 +3453,26 @@
       });
     }
 
+    function createBaseLeafletMap(containerId) {
+      const map = L.map(containerId).setView([-2.75, 105.6], 7);
+      const esriTopo = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}", { attribution: "Tiles &copy; Esri", maxZoom: 19 });
+      const esriSat = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { attribution: "Tiles &copy; Esri", maxZoom: 19 });
+      const osmStd = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "&copy; OpenStreetMap", maxZoom: 19 });
+      esriTopo.addTo(map);
+      L.control.layers({
+        "🗺️ Topografi (Esri)": esriTopo,
+        "🛰️ Satelit (Esri)": esriSat,
+        "🌍 OpenStreetMap": osmStd
+      }, null, { position: "topright" }).addTo(map);
+      const layerGroup = L.layerGroup().addTo(map);
+      return { map, layerGroup };
+    }
+
     function renderDeMap(locList) {
       if (!deLeafletMap) {
-        deLeafletMap = L.map("de-map-container").setView([-2.75, 105.6], 7);
-        const esriTopo = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}", { attribution: "Tiles &copy; Esri", maxZoom: 19 });
-        const esriSat = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { attribution: "Tiles &copy; Esri", maxZoom: 19 });
-        const osmStd = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "&copy; OpenStreetMap", maxZoom: 19 });
-        esriTopo.addTo(deLeafletMap);
-        L.control.layers({
-          "🗺️ Topografi (Esri)": esriTopo,
-          "🛰️ Satelit (Esri)": esriSat,
-          "🌍 OpenStreetMap": osmStd
-        }, null, { position: "topright" }).addTo(deLeafletMap);
-        deMapLayerGroup = L.layerGroup().addTo(deLeafletMap);
+        const created = createBaseLeafletMap("de-map-container");
+        deLeafletMap = created.map;
+        deMapLayerGroup = created.layerGroup;
       }
 
       deMapLayerGroup.clearLayers();
@@ -3707,18 +3778,27 @@
         else if (r.kon === "NO DATA") um.nodata++;
         else um.belum++;
 
-        if (r.loc !== "-" && r.tobj !== null) {
+        if (r.loc !== "-") {
           const sKey = `${r.i}||${r.loc}`;
           let sm = spanMap.get(sKey);
           if (!sm) {
-            sm = { loc: r.loc, induk: r.i, maxTemp: r.tobj, maxTs: r.ts || 0, hasP0: false, hasP1: false, anomali: 0 };
+            sm = { loc: r.loc, induk: r.i, ultg: r.u, lat: r.lat, lng: r.lng, total: 0, mj: 0, rs: 0, upd: 0, baik: 0, har: 0, perbaiki: 0, maxTemp: r.tobj ?? 0, maxDt: r.dt_val ?? 0, maxTs: r.ts || 0, hasP0: false, hasP1: false, anomali: 0 };
             spanMap.set(sKey, sm);
           }
-          if (r.tobj > sm.maxTemp) sm.maxTemp = r.tobj;
+          sm.total++;
+          if (r.k === "MJ") sm.mj++; else if (r.k === "RS") sm.rs++;
+          if (r.st26 === "Data Update") sm.upd++;
+          if (r.kon === "BAIK") sm.baik++;
+          else if (r.kon === "PERIKSA SAAT HAR") sm.har++;
+          else if (r.kon === "PERBAIKI < 3 BLN") sm.perbaiki++;
+          if (r.tobj !== null && r.tobj > sm.maxTemp) sm.maxTemp = r.tobj;
+          if (r.dt_val !== null && r.dt_val > sm.maxDt) sm.maxDt = r.dt_val;
           if ((r.ts || 0) > sm.maxTs) sm.maxTs = r.ts || 0;
           if (r.prio === "P0") sm.hasP0 = true;
           if (r.prio === "P1") sm.hasP1 = true;
           if (isAnomaliKondisi(r.kon)) sm.anomali++;
+          if (sm.lat === null && r.lat !== null) sm.lat = r.lat;
+          if (sm.lng === null && r.lng !== null) sm.lng = r.lng;
         }
       }
 
@@ -3873,7 +3953,9 @@
       });
 
       // Chart 5: Top 15 Span MJ / RS
-      const topSpans = Array.from(spanMap.values())
+      const allSpanList = Array.from(spanMap.values());
+      const topSpans = allSpanList
+        .filter(s => s.maxTemp > 0)
         .sort((a, b) => (b.maxTs - a.maxTs) || (b.anomali - a.anomali) || (b.maxTemp - a.maxTemp))
         .slice(0, 15);
       const ctxTop = document.getElementById("chart-ms-top-spans").getContext("2d");
@@ -3906,7 +3988,47 @@
         }
       });
 
+      renderMsMap(allSpanList);
       renderMsTables(filtered);
+    }
+
+    function renderMsMap(spanList) {
+      if (!msLeafletMap) {
+        const created = createBaseLeafletMap("ms-map-container");
+        msLeafletMap = created.map;
+        msMapLayerGroup = created.layerGroup;
+      }
+      msMapLayerGroup.clearLayers();
+      const bounds = [];
+      const sorted = [...spanList]
+        .filter(s => s.lat !== null && s.lng !== null)
+        .sort((a, b) => (b.perbaiki - a.perbaiki) || (b.hasP0 ? 1 : 0) - (a.hasP0 ? 1 : 0) || (b.har - a.har) || (b.maxTemp - a.maxTemp))
+        .slice(0, 1600);
+
+      document.getElementById("ms-map-count").textContent = `${fmtNum(sorted.length)} span`;
+      for (const s of sorted) {
+        const hasCrit = s.perbaiki > 0 || s.hasP0;
+        const hasWarn = s.har > 0 || s.hasP1;
+        const hasTest = s.upd > 0 || s.baik > 0;
+        const color = hasCrit ? "#f43f5e" : hasWarn ? "#f59e0b" : hasTest ? "#10b981" : "#94a3b8";
+        const radius = hasCrit ? 7 : hasWarn ? 6 : 4.5;
+        const marker = L.circleMarker([s.lat, s.lng], {
+          radius, fillColor: color, color: "#0f172a", weight: 1, opacity: 0.9, fillOpacity: 0.85
+        });
+        marker.bindPopup(
+          `<div style="font-family:Inter,sans-serif;font-size:12px;line-height:1.45;">
+            <strong>${escapeHtml(s.loc)}</strong><br/>
+            <span style="color:#475569">${escapeHtml(s.induk)} (${escapeHtml(s.ultg)})</span><br/>
+            <hr style="margin:4px 0"/>
+            Titik MJ/RS: <b>${s.total}</b> (MJ: ${s.mj}, RS: ${s.rs}) • Realisasi: <b>${s.upd}/${s.total}</b><br/>
+            Baik: ${s.baik} • Har: ${s.har} • Perbaiki: ${s.perbaiki}<br/>
+            Max Suhu: <b>${s.maxTemp > 0 ? fmtDec(s.maxTemp, 1) + " °C" : "-"}</b> • Max ΔT: <b>${s.maxDt > 0 ? fmtDec(s.maxDt, 1) + " °C" : "-"}</b>
+          </div>`
+        );
+        marker.addTo(msMapLayerGroup);
+        bounds.push([s.lat, s.lng]);
+      }
+      if (bounds.length > 0) msLeafletMap.fitBounds(bounds, { padding: [24, 24], maxZoom: 12 });
     }
 
     function renderMsTables(filtered) {
@@ -4739,11 +4861,14 @@
         if (!tw) {
           tw = {
             key, ultg: r.u, induk: r.i, loc: r.loc, towerNum: extractTowerNumber(r.loc),
+            lat: r.lat ?? null, lng: r.lng ?? null,
             jenisSet: new Set(), total: 0, upd: 0, cek: 0, kos: 0,
             lastDt: "", worstKon: "BELUM UJI", maxTemp: null, records: []
           };
           towerMap.set(key, tw);
         }
+        if (tw.lat === null && r.lat !== null) tw.lat = r.lat;
+        if (tw.lng === null && r.lng !== null) tw.lng = r.lng;
         tw.jenisSet.add(r._jenis);
         tw.total++;
         if (r.st26 === "Data Update") tw.upd++;
@@ -4844,7 +4969,46 @@
       renderRlUltgChart(ultgMap);
       renderRlTowerDistChart(twLengkap, twSebagian, twBelum);
       renderRlIndukChart(currentRlIndukList);
+      renderRlMap(filteredTowers);
       renderRlTables();
+    }
+
+    function renderRlMap(towerList) {
+      if (!rlLeafletMap) {
+        const created = createBaseLeafletMap("rl-map-container");
+        rlLeafletMap = created.map;
+        rlMapLayerGroup = created.layerGroup;
+      }
+      rlMapLayerGroup.clearLayers();
+      const bounds = [];
+      const ord = s => s === "BELUM" ? 0 : s === "SEBAGIAN" ? 1 : 2;
+      const sorted = [...towerList]
+        .filter(tw => tw.lat !== null && tw.lng !== null)
+        .sort((a, b) => (ord(a.status) - ord(b.status)) || a.induk.localeCompare(b.induk))
+        .slice(0, 1800);
+
+      document.getElementById("rl-map-count").textContent = `${fmtNum(sorted.length)} lokasi`;
+      for (const tw of sorted) {
+        const color = tw.status === "LENGKAP" ? "#10b981" : tw.status === "SEBAGIAN" ? "#f59e0b" : "#f43f5e";
+        const radius = tw.status === "BELUM" ? 6.5 : tw.status === "SEBAGIAN" ? 6 : 4.5;
+        const stText = tw.status === "LENGKAP" ? "Sudah Realisasi (100%)" : tw.status === "SEBAGIAN" ? "Realisasi Sebagian" : "Belum Realisasi (0%)";
+        const marker = L.circleMarker([tw.lat, tw.lng], {
+          radius, fillColor: color, color: "#0f172a", weight: 1, opacity: 0.9, fillOpacity: 0.85
+        });
+        marker.bindPopup(
+          `<div style="font-family:Inter,sans-serif;font-size:12px;line-height:1.45;">
+            <strong>${escapeHtml(tw.loc)}</strong><br/>
+            <span style="color:#475569">${escapeHtml(tw.induk)} (${escapeHtml(tw.ultg)})</span><br/>
+            <hr style="margin:4px 0"/>
+            Jenis Aset: <b>${escapeHtml(tw.jenisLabel)}</b> • Status: <b>${stText}</b><br/>
+            Realisasi: <b>${tw.upd}/${tw.total}</b> (${fmtDec(tw.pct, 1)}%) • Belum: <b>${tw.belum}</b><br/>
+            Tgl Uji Terakhir: <b>${escapeHtml(tw.lastDt || "-")}</b> • Max Suhu: <b>${tw.maxTemp !== null ? fmtDec(tw.maxTemp, 1) + " °C" : "-"}</b>
+          </div>`
+        );
+        marker.addTo(rlMapLayerGroup);
+        bounds.push([tw.lat, tw.lng]);
+      }
+      if (bounds.length > 0) rlLeafletMap.fitBounds(bounds, { padding: [24, 24], maxZoom: 12 });
     }
 
     function renderRlUltgChart(ultgMap) {
