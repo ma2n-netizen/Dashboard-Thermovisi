@@ -1193,9 +1193,20 @@
           </div>
         </div>
 
-        <div class="mt-3.5 pt-3 border-t border-slate-800/80 flex flex-wrap items-center gap-2">
-          <span class="text-xs font-semibold text-slate-400 mr-1">Klik Cepat Bulan:</span>
-          <div id="ms-month-pills" class="flex flex-wrap gap-1.5"></div>
+        <div class="mt-3.5 pt-3 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-xs font-semibold text-slate-400 mr-1">Klik Cepat Bulan:</span>
+            <div id="ms-month-pills" class="flex flex-wrap gap-1.5"></div>
+          </div>
+          <div class="flex items-center gap-2 text-xs">
+            <span class="text-slate-400 font-semibold">Phasa:</span>
+            <select id="ms-ph" class="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 text-xs text-white">
+              <option value="ALL">Semua (R/S/T)</option>
+              <option value="R">Phasa R</option>
+              <option value="S">Phasa S</option>
+              <option value="T">Phasa T</option>
+            </select>
+          </div>
         </div>
       </section>
 
@@ -1234,14 +1245,56 @@
       </section>
 
       <!-- GRAFIK 1 MIDSPAN -->
-      <section class="glass-card rounded-2xl p-4 lg:p-5 shadow-xl">
-        <div class="pb-3 border-b border-slate-800">
-          <h3 class="text-sm font-bold text-slate-200">Realisasi Pengujian Midspan Joint &amp; Repair Sleeve per
-            Penghantar</h3>
-          <p class="text-xs text-slate-400">Distribusi titik Baik, Anomali, No Data, dan Belum Uji di tiap penghantar
-            (klik batang untuk filter)</p>
+      <section class="glass-card rounded-2xl p-5 shadow-xl">
+        <div class="flex flex-wrap items-center justify-between gap-3 pb-4 mb-4 border-b border-slate-800">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 text-[10px] font-extrabold uppercase rounded bg-cyan-500 text-slate-950">GRAFIK
+                1 • UTAMA</span>
+              <h2 class="text-base lg:text-lg font-extrabold text-white">
+                Grafik Kondisi &amp; Realisasi Midspan (MJ) &amp; Repair Sleeve (RS) Tiap Penghantar
+              </h2>
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">
+              Diurutkan sesuai jumlah titik atau anomali tertinggi. <strong class="text-cyan-300">Klik pada batang
+                penghantar</strong> untuk memfilter detail span &amp; titik MJ/RS penghantar tersebut.
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="inline-flex rounded-xl bg-slate-900 p-1 border border-slate-700 text-xs">
+              <button data-msmode="kondisi"
+                class="ms-chartmode-btn px-2.5 py-1 rounded-lg font-semibold bg-cyan-500 text-slate-950">Rincian
+                Kondisi</button>
+              <button data-msmode="status26"
+                class="ms-chartmode-btn px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white">Realisasi
+                2026</button>
+              <button data-msmode="anomali"
+                class="ms-chartmode-btn px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white">Fokus
+                Anomali</button>
+            </div>
+            <div class="inline-flex rounded-xl bg-slate-900 p-1 border border-slate-700 text-xs">
+              <button data-mslimit="15"
+                class="ms-limit-btn px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white">Top
+                15</button>
+              <button data-mslimit="25"
+                class="ms-limit-btn px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white">Top
+                25</button>
+              <button data-mslimit="ALL"
+                class="ms-limit-btn px-2.5 py-1 rounded-lg font-semibold bg-cyan-500 text-slate-950">Semua</button>
+            </div>
+            <div class="inline-flex rounded-xl bg-slate-900 p-1 border border-slate-700 text-xs">
+              <button data-msorient="vertical"
+                class="ms-orient-btn px-2.5 py-1 rounded-lg font-semibold bg-sky-500 text-slate-950">Batang
+                Tegak</button>
+              <button data-msorient="horizontal"
+                class="ms-orient-btn px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white">Batang
+                Mendatar</button>
+            </div>
+          </div>
         </div>
-        <div class="mt-3" style="height: 410px;">
+
+        <div id="ms-induk-chart-wrapper" class="relative w-full" style="height: 460px;">
           <canvas id="chart-ms-induk"></canvas>
         </div>
       </section>
@@ -1271,74 +1324,128 @@
         </div>
       </section>
 
-      <!-- GRAFIK 4 & 5 MIDSPAN: SKOR SUHU/DELTA & TOP 15 SPAN -->
+      <!-- GRAFIK 4 & PETA SPASIAL MIDSPAN (MIRIP TAB DEAD END) -->
       <section class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <div class="glass-card rounded-2xl p-4 lg:p-5 shadow-xl">
-          <div class="pb-3 border-b border-slate-800">
-            <h3 class="text-sm font-bold text-slate-200">Distribusi Skor Suhu Klem &amp; Skor Delta T (ΔT)</h3>
-            <p class="text-xs text-slate-400">Skor 1 (Normal), Skor 5 (Waspada: Suhu 40–49.9°C / ΔT 5–30°C), Skor 10
-              (Kritis: &ge;50°C / &gt;30°C)</p>
+        <div class="glass-card rounded-2xl p-5 shadow-xl">
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-800">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 text-[10px] font-extrabold uppercase rounded bg-rose-500 text-white">GRAFIK 4 •
+                  SPAN MJ/RS</span>
+                <h3 id="ms-span-chart-title" class="text-sm lg:text-base font-bold text-white">Top 25 Span (MJ / RS)
+                  Prioritas &amp; Suhu Tertinggi</h3>
+              </div>
+              <p id="ms-span-chart-subtitle" class="text-xs text-slate-400 mt-0.5">Menampilkan 25 span MJ/RS dengan skor
+                prioritas tertinggi dan suhu objek maksimum (°C).</p>
+            </div>
+            <div class="inline-flex rounded-xl bg-slate-900 p-1 border border-slate-700 text-xs">
+              <button data-msspanmode="prio"
+                class="ms-spanmode-btn px-2.5 py-1 rounded-lg font-semibold bg-rose-500 text-white">Top Suhu &amp;
+                Prioritas</button>
+              <button data-msspanmode="sequence"
+                class="ms-spanmode-btn px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white">Urut Nomor
+                Span</button>
+            </div>
           </div>
-          <div class="h-72 mt-3">
-            <canvas id="chart-ms-scores"></canvas>
-          </div>
-        </div>
-
-        <div class="glass-card rounded-2xl p-4 lg:p-5 shadow-xl">
-          <div class="pb-3 border-b border-slate-800">
-            <h3 class="text-sm font-bold text-slate-200">Top 15 Span (MJ / RS) Prioritas &amp; Suhu Tertinggi</h3>
-            <p class="text-xs text-slate-400">Lokasi span dengan skor prioritas tertinggi dan suhu objek maksimum (°C)
-            </p>
-          </div>
-          <div class="h-72 mt-3">
+          <div class="relative w-full" style="height: 360px;">
             <canvas id="chart-ms-top-spans"></canvas>
           </div>
         </div>
-      </section>
 
-      <!-- PETA SPASIAL SPAN MIDSPAN & REPAIR SLEEVE -->
-      <section class="glass-card rounded-2xl p-4 lg:p-5 shadow-xl">
-        <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-800">
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="px-2 py-0.5 text-[10px] font-extrabold uppercase rounded bg-cyan-500 text-slate-950">PETA
-                SPASIAL SPAN</span>
-              <h3 class="text-sm lg:text-base font-bold text-white">Peta Sebaran Koordinat Span Midspan (MJ) &amp;
-                Repair Sleeve (RS)</h3>
-              <span id="ms-map-count"
-                class="px-2 py-0.5 text-[11px] font-bold rounded-full bg-cyan-500/20 text-cyan-300">0 span</span>
+        <div class="glass-card rounded-2xl p-5 shadow-xl flex flex-col">
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-800">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 text-[10px] font-extrabold uppercase rounded bg-cyan-500 text-slate-950">PETA
+                  SPASIAL</span>
+                <h3 class="text-sm lg:text-base font-bold text-white">Peta Sebaran Hotspot Span MJ &amp; RS</h3>
+                <span id="ms-map-count"
+                  class="px-2 py-0.5 text-[11px] font-bold rounded-full bg-cyan-500/20 text-cyan-300">0 span</span>
+              </div>
+              <p class="text-xs text-slate-400 mt-0.5">Sebaran koordinat span Midspan &amp; Repair Sleeve Sumsel &amp;
+                Babel.</p>
             </div>
-            <p class="text-xs text-slate-400 mt-0.5">Sebaran koordinat span MJ &amp; RS berdasarkan hasil ukur dan
-              prioritas kondisi (klik titik span untuk rincian).</p>
+            <div class="flex flex-wrap items-center gap-2 text-[11px]">
+              <span class="inline-flex items-center gap-1"><span
+                  class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>Baik</span>
+              <span class="inline-flex items-center gap-1"><span
+                  class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>Har / P1–P2</span>
+              <span class="inline-flex items-center gap-1"><span
+                  class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>Perbaiki / P0</span>
+              <span class="inline-flex items-center gap-1"><span
+                  class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>Belum Uji</span>
+            </div>
           </div>
-          <div class="flex flex-wrap items-center gap-2.5 text-[11px]">
-            <span class="inline-flex items-center gap-1"><span
-                class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>Baik / Normal</span>
-            <span class="inline-flex items-center gap-1"><span
-                class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>Har / P1–P2</span>
-            <span class="inline-flex items-center gap-1"><span
-                class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>Perbaiki / P0</span>
-            <span class="inline-flex items-center gap-1"><span
-                class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>Belum Uji</span>
-          </div>
+          <div id="ms-map-container" class="w-full rounded-xl overflow-hidden border border-slate-700 flex-1"
+            style="min-height: 360px;"></div>
         </div>
-        <div id="ms-map-container" class="w-full rounded-xl overflow-hidden border border-slate-700"
-          style="height: 380px;"></div>
       </section>
 
-      <!-- TABEL 1 MIDSPAN: PER PENGHANTAR -->
+      <!-- GRAFIK 5 MIDSPAN: DISTRIBUSI SKOR SUHU & DELTA T -->
       <section class="glass-card rounded-2xl p-4 lg:p-5 shadow-xl">
-        <div class="flex flex-wrap items-center justify-between gap-3 pb-3 mb-3 border-b border-slate-800">
-          <div>
-            <h3 class="text-sm font-bold text-slate-200 uppercase tracking-wider">Rekap Realisasi Midspan &amp; Repair
-              Sleeve Per Penghantar (<span id="ms-count-induk">0</span> Penghantar)</h3>
-            <p class="text-xs text-slate-400">Klik <strong>Lihat Aset</strong> untuk melihat rincian titik MJ &amp; RS
-              pada Tabel 2 di bawah.</p>
-          </div>
-          <input id="ms-search-induk" type="text" placeholder="Cari penghantar atau ULTG..."
-            class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-200 w-56 lg:w-72 focus:outline-none focus:ring-2 focus:ring-cyan-500" />
+        <div class="pb-3 border-b border-slate-800">
+          <h3 class="text-sm font-bold text-slate-200">Distribusi Skor Suhu Klem &amp; Skor Delta T (ΔT)</h3>
+          <p class="text-xs text-slate-400">Skor 1 (Normal), Skor 5 (Waspada: Suhu 40–49.9°C / ΔT 5–30°C), Skor 10
+            (Kritis: &ge;50°C / &gt;30°C)</p>
         </div>
-        <div class="overflow-x-auto rounded-xl border border-slate-800 max-h-[420px]">
+        <div class="h-64 mt-3">
+          <canvas id="chart-ms-scores"></canvas>
+        </div>
+      </section>
+
+      <!-- TABEL REKAP MIDSPAN & REPAIR SLEEVE (TABBED SEPERTI TAB 1 DEAD END) -->
+      <section id="section-ms-tables" class="glass-card rounded-2xl p-5 shadow-xl">
+        <div class="flex flex-wrap items-center justify-between gap-3 pb-4 mb-4 border-b border-slate-800">
+          <div class="flex items-center gap-2">
+            <button id="ms-tab-btn-induk"
+              class="px-4 py-2 rounded-xl text-xs font-bold bg-cyan-500 text-slate-950 transition">
+              📋 Tabel Rekap Per Penghantar (<span id="ms-count-induk">0</span>)
+            </button>
+            <button id="ms-tab-btn-assets"
+              class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">
+              🔗 Tabel Rincian Titik MJ &amp; RS (<span id="ms-count-assets">0</span>)
+            </button>
+          </div>
+          <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+            <input id="ms-search" type="text" placeholder="Cari penghantar, ULTG, span (#0012), atau IDEQP..."
+              class="w-full sm:w-80 px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white focus:outline-none focus:border-cyan-500" />
+            <select id="ms-limit"
+              class="hidden px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white focus:outline-none">
+              <option value="25">25 baris</option>
+              <option value="50" selected>50 baris</option>
+              <option value="100">100 baris</option>
+              <option value="250">250 baris</option>
+              <option value="ALL">Semua</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="ms-quick-status-bar" class="hidden flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div class="flex flex-wrap items-center gap-1.5 text-xs">
+            <span class="text-slate-400 font-semibold mr-1">Filter Cepat:</span>
+            <button data-msstatus="ALL"
+              class="ms-status-btn px-3 py-1.5 rounded-xl font-bold bg-cyan-500 text-slate-950 transition">Semua</button>
+            <button data-msstatus="Data Update"
+              class="ms-status-btn px-3 py-1.5 rounded-xl font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">✅
+              Data Update</button>
+            <button data-msstatus="ANOMALI"
+              class="ms-status-btn px-3 py-1.5 rounded-xl font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">🚨
+              Anomali</button>
+            <button data-msstatus="Cek Kembali"
+              class="ms-status-btn px-3 py-1.5 rounded-xl font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">🔄
+              Cek Kembali</button>
+            <button data-msstatus="DATA KOSONG"
+              class="ms-status-btn px-3 py-1.5 rounded-xl font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">⚪
+              DATA KOSONG</button>
+          </div>
+          <button id="btn-export-ms-table-csv" onclick="exportMsCsv()"
+            class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1.5 transition">
+            <span>📥</span><span>Export Titik MJ &amp; RS (CSV)</span>
+          </button>
+        </div>
+
+        <!-- TABEL 1 MIDSPAN: PER PENGHANTAR -->
+        <div id="ms-wrap-induk" class="overflow-x-auto max-h-[520px]">
           <table class="w-full text-left text-xs whitespace-nowrap">
             <thead
               class="sticky top-0 bg-slate-900 text-slate-300 uppercase tracking-wider font-bold border-b border-slate-800 z-10">
@@ -1364,46 +1471,9 @@
               class="sticky bottom-0 bg-slate-900 font-bold text-white border-t-2 border-cyan-500/50"></tfoot>
           </table>
         </div>
-      </section>
 
-      <!-- TABEL 2 MIDSPAN: RINCIAN ASET -->
-      <section id="section-ms-assets" class="glass-card rounded-2xl p-4 lg:p-5 shadow-xl">
-        <div class="flex flex-wrap items-center justify-between gap-3 pb-3 mb-3 border-b border-slate-800">
-          <div class="flex items-center gap-2">
-            <span class="text-cyan-400 text-base">📋</span>
-            <h3 class="text-sm font-bold text-slate-200 uppercase tracking-wider">Tabel Rincian Titik Midspan Joint (MJ)
-              &amp; Repair Sleeve (RS)</h3>
-            <span id="ms-count-assets" class="px-2 py-0.5 text-xs font-bold rounded-full bg-cyan-500/20 text-cyan-300">0
-              baris</span>
-          </div>
-          <div class="flex flex-wrap items-center gap-2">
-            <div class="flex flex-wrap items-center gap-1 text-xs">
-              <button data-msstatus="ALL"
-                class="ms-status-btn px-2.5 py-1 rounded-lg font-bold bg-cyan-500 text-slate-950 transition">Semua</button>
-              <button data-msstatus="Data Update"
-                class="ms-status-btn px-2.5 py-1 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">Update</button>
-              <button data-msstatus="ANOMALI"
-                class="ms-status-btn px-2.5 py-1 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">Anomali</button>
-              <button data-msstatus="Cek Kembali"
-                class="ms-status-btn px-2.5 py-1 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">Cek
-                Kembali</button>
-              <button data-msstatus="DATA KOSONG"
-                class="ms-status-btn px-2.5 py-1 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">Kosong</button>
-            </div>
-            <input type="text" id="ms-search-asset" placeholder="Cari Span / Penghantar / IDEQP..."
-              class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 w-52 lg:w-64" />
-            <select id="ms-limit"
-              class="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-200 focus:outline-none">
-              <option value="25">25</option>
-              <option value="50" selected>50</option>
-              <option value="100">100</option>
-              <option value="250">250</option>
-              <option value="ALL">Semua</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="overflow-x-auto rounded-xl border border-slate-800 max-h-[580px]">
+        <!-- TABEL 2 MIDSPAN: RINCIAN ASET -->
+        <div id="ms-wrap-assets" class="hidden overflow-x-auto max-h-[540px]">
           <table class="w-full text-left text-xs whitespace-nowrap">
             <thead
               class="sticky top-0 bg-slate-900 text-slate-300 uppercase tracking-wider font-bold border-b border-slate-800 shadow-sm z-10">
@@ -1434,8 +1504,8 @@
           </table>
         </div>
 
-        <div
-          class="flex flex-wrap items-center justify-between gap-3 pt-3 mt-3 border-t border-slate-800 text-xs text-slate-400">
+        <div id="ms-pagination-wrap"
+          class="hidden flex flex-wrap items-center justify-between gap-3 pt-3 mt-3 border-t border-slate-800 text-xs text-slate-400">
           <div id="ms-pagination-info">Menampilkan 0 – 0 dari 0 baris</div>
           <div class="flex items-center gap-2">
             <button id="ms-btn-prev"
@@ -2470,9 +2540,14 @@
       prio: "ALL",
       skorSuhu: "ALL",
       skorDelta: "ALL",
-      searchInduk: "",
+      ph: "ALL",
+      chartMode: "kondisi",
+      indukLimit: "ALL",
+      indukOrient: "vertical",
+      spanMode: "prio",
+      activeTab: "induk",
+      search: "",
       statusBtn: "ALL",
-      searchAsset: "",
       limit: "50",
       page: 1
     };
@@ -3722,6 +3797,7 @@
         if (msState.prio !== "ALL" && r.prio !== msState.prio) return false;
         if (msState.skorSuhu !== "ALL" && String(r.ss) !== String(msState.skorSuhu)) return false;
         if (msState.skorDelta !== "ALL" && String(r.sd) !== String(msState.skorDelta)) return false;
+        if (msState.ph !== "ALL" && r.ph !== msState.ph) return false;
         return true;
       });
     }
@@ -3803,8 +3879,12 @@
       }
 
       currentMsIndukList = Array.from(indukMap.values())
-        .map(d => ({ ...d, pctReal: d.total > 0 ? (d.upd / d.total) * 100 : 0 }))
-        .sort((a, b) => b.total - a.total);
+        .map(d => ({ ...d, pctReal: d.total > 0 ? (d.upd / d.total) * 100 : 0 }));
+      if (msState.chartMode === "anomali") {
+        currentMsIndukList.sort((a, b) => (b.anomali - a.anomali) || (b.total - a.total));
+      } else {
+        currentMsIndukList.sort((a, b) => (b.total - a.total) || (b.anomali - a.anomali));
+      }
 
       const total = filtered.length;
       const pctReal = total > 0 ? ((upd / total) * 100).toFixed(1) : "0.0";
@@ -3823,22 +3903,43 @@
       document.getElementById("ms-kpi-prio").textContent = fmtNum(p0 + p1 + p2);
       document.getElementById("ms-kpi-prio-sub").textContent = `P0: ${fmtNum(p0)} • P1: ${fmtNum(p1)} • P2: ${fmtNum(p2)}`;
 
-      // Chart 1: MS per Penghantar
-      const chartList = currentMsIndukList.slice(0, 40);
+      // Chart 1: MS per Penghantar (Mode / Limit / Orientasi seperti Tab Dead End)
+      const msLimit = msState.indukLimit === "ALL" ? currentMsIndukList.length : parseInt(msState.indukLimit, 10);
+      const chartList = currentMsIndukList.slice(0, msLimit);
+      const msIsHoriz = msState.indukOrient === "horizontal";
+      const msWrapper = document.getElementById("ms-induk-chart-wrapper");
+      msWrapper.style.height = msIsHoriz ? `${Math.max(420, chartList.length * 28 + 80)}px` : "460px";
+
+      let msDatasets = [];
+      if (msState.chartMode === "anomali") {
+        msDatasets = [
+          { label: "Anomali (Har + Perbaiki)", data: chartList.map(d => d.anomali), backgroundColor: "rgba(244, 63, 94, 0.9)", borderRadius: 4 }
+        ];
+      } else if (msState.chartMode === "status26") {
+        msDatasets = [
+          { label: "Data Update (2026)", data: chartList.map(d => d.upd), backgroundColor: "rgba(16, 185, 129, 0.85)", borderRadius: 3 },
+          { label: "Cek Kembali", data: chartList.map(d => d.cek), backgroundColor: "rgba(245, 158, 11, 0.88)", borderRadius: 3 },
+          { label: "DATA KOSONG", data: chartList.map(d => d.kos), backgroundColor: "rgba(148, 163, 184, 0.55)", borderRadius: 3 }
+        ];
+      } else {
+        msDatasets = [
+          { label: "Baik", data: chartList.map(d => d.baik), backgroundColor: "rgba(16, 185, 129, 0.85)", borderRadius: 3 },
+          { label: "Anomali", data: chartList.map(d => d.anomali), backgroundColor: "rgba(244, 63, 94, 0.9)", borderRadius: 3 },
+          { label: "No Data", data: chartList.map(d => d.nodata), backgroundColor: "rgba(168, 85, 247, 0.78)", borderRadius: 3 },
+          { label: "Belum Uji", data: chartList.map(d => d.belum), backgroundColor: "rgba(148, 163, 184, 0.5)", borderRadius: 3 }
+        ];
+      }
+
       const ctx1 = document.getElementById("chart-ms-induk").getContext("2d");
       if (chartMsInduk) chartMsInduk.destroy();
       chartMsInduk = new Chart(ctx1, {
         type: "bar",
         data: {
           labels: chartList.map(d => d.induk.replace(/^TRS\s+/i, "")),
-          datasets: [
-            { label: "Baik", data: chartList.map(d => d.baik), backgroundColor: "rgba(16, 185, 129, 0.85)" },
-            { label: "Anomali", data: chartList.map(d => d.anomali), backgroundColor: "rgba(244, 63, 94, 0.9)" },
-            { label: "No Data", data: chartList.map(d => d.nodata), backgroundColor: "rgba(168, 85, 247, 0.78)" },
-            { label: "Belum Uji", data: chartList.map(d => d.belum), backgroundColor: "rgba(148, 163, 184, 0.5)" }
-          ]
+          datasets: msDatasets
         },
         options: {
+          indexAxis: msIsHoriz ? "y" : "x",
           responsive: true,
           maintainAspectRatio: false,
           onClick: (_, els) => {
@@ -3853,10 +3954,22 @@
             }
           },
           scales: {
-            x: { stacked: true, grid: { color: "rgba(148, 163, 184, 0.1)" }, ticks: { color: "#cbd5e1", font: { size: 9.5, weight: "600" }, maxRotation: 55, minRotation: 40 } },
-            y: { stacked: true, beginAtZero: true, grace: "10%", grid: { color: "rgba(148, 163, 184, 0.1)" }, ticks: { color: "#cbd5e1" } }
+            x: { stacked: true, grid: { color: "rgba(148, 163, 184, 0.1)" }, ticks: { color: "#cbd5e1", font: { size: 9.5, weight: "600" }, maxRotation: msIsHoriz ? 0 : 55, minRotation: msIsHoriz ? 0 : 40 } },
+            y: { stacked: true, beginAtZero: true, grace: "12%", grid: { color: "rgba(148, 163, 184, 0.1)" }, ticks: { color: "#cbd5e1" } }
           },
-          plugins: { legend: { labels: { color: "#e2e8f0", font: { size: 11 } } }, datalabels: { display: false } }
+          plugins: {
+            legend: { labels: { color: "#e2e8f0", font: { size: 11 } } },
+            datalabels: {
+              display: ctx => chartList.length <= 25 && ctx.datasetIndex === msDatasets.length - 1,
+              anchor: "end", align: msIsHoriz ? "right" : "top", offset: 2, font: { size: 10, weight: "700" },
+              formatter: (_, ctx) => {
+                const row = chartList[ctx.dataIndex];
+                if (!row) return "";
+                const v = msState.chartMode === "anomali" ? row.anomali : row.total;
+                return v > 0 ? fmtNum(v) : "";
+              }
+            }
+          }
         }
       });
 
@@ -3952,12 +4065,30 @@
         }
       });
 
-      // Chart 5: Top 15 Span MJ / RS
+      // Chart 4: Top 25 Span MJ / RS atau Urut Nomor Span
       const allSpanList = Array.from(spanMap.values());
-      const topSpans = allSpanList
-        .filter(s => s.maxTemp > 0)
-        .sort((a, b) => (b.maxTs - a.maxTs) || (b.anomali - a.anomali) || (b.maxTemp - a.maxTemp))
-        .slice(0, 15);
+      const spanTitleEl = document.getElementById("ms-span-chart-title");
+      const spanSubEl = document.getElementById("ms-span-chart-subtitle");
+      let topSpans = [];
+      if (msState.spanMode === "sequence") {
+        topSpans = allSpanList
+          .filter(s => s.maxTemp > 0)
+          .sort((a, b) => extractTowerNumber(a.loc) - extractTowerNumber(b.loc))
+          .slice(0, 50);
+        spanTitleEl.textContent = msState.induk !== "ALL"
+          ? `Profil Suhu MJ/RS Urut Nomor Span — ${msState.induk}`
+          : "Profil Suhu MJ/RS Urut Nomor Span (50 Span Pertama)";
+        spanSubEl.textContent = "Menampilkan suhu objek tertinggi (°C) pada tiap span MJ/RS berdasarkan urutan nomor span.";
+      } else {
+        topSpans = allSpanList
+          .filter(s => s.maxTemp > 0)
+          .sort((a, b) => (b.maxTs - a.maxTs) || (b.anomali - a.anomali) || (b.maxTemp - a.maxTemp))
+          .slice(0, 25);
+        spanTitleEl.textContent = msState.induk !== "ALL"
+          ? `Top 25 Span MJ/RS Prioritas & Suhu — ${msState.induk}`
+          : "Top 25 Span (MJ / RS) Prioritas & Suhu Tertinggi";
+        spanSubEl.textContent = "Menampilkan 25 span MJ/RS dengan skor prioritas tertinggi dan suhu objek maksimum (°C).";
+      }
       const ctxTop = document.getElementById("chart-ms-top-spans").getContext("2d");
       if (chartMsTopSpans) chartMsTopSpans.destroy();
       chartMsTopSpans = new Chart(ctxTop, {
@@ -3976,14 +4107,14 @@
           }]
         },
         options: {
-          indexAxis: "y", responsive: true, maintainAspectRatio: false,
+          responsive: true, maintainAspectRatio: false,
           scales: {
-            x: { beginAtZero: true, grace: "15%", grid: { color: "rgba(148, 163, 184, 0.1)" }, ticks: { color: "#cbd5e1" } },
-            y: { grid: { color: "rgba(148, 163, 184, 0.08)" }, ticks: { color: "#cbd5e1", font: { size: 10, weight: "600" } } }
+            x: { grid: { color: "rgba(148, 163, 184, 0.08)" }, ticks: { color: "#cbd5e1", font: { size: 9.5, weight: "600" }, maxRotation: 55, minRotation: 40 } },
+            y: { beginAtZero: true, grace: "14%", grid: { color: "rgba(148, 163, 184, 0.1)" }, ticks: { color: "#cbd5e1", font: { size: 10.5 } } }
           },
           plugins: {
             legend: { display: false },
-            datalabels: { anchor: "end", align: "right", font: { size: 9.5, weight: "700" }, formatter: v => (v > 0 ? `${v.toFixed(1)}°` : "") }
+            datalabels: { display: topSpans.length <= 28, anchor: "end", align: "top", font: { size: 9, weight: "700" }, formatter: v => (v > 0 ? `${v.toFixed(1)}°` : "") }
           }
         }
       });
@@ -4032,8 +4163,8 @@
     }
 
     function renderMsTables(filtered) {
-      const qInd = msState.searchInduk.trim().toLowerCase();
-      const indRows = currentMsIndukList.filter(d => !qInd || d.induk.toLowerCase().includes(qInd) || d.ultg.toLowerCase().includes(qInd));
+      const q = msState.search.trim().toLowerCase();
+      const indRows = currentMsIndukList.filter(d => !q || d.induk.toLowerCase().includes(q) || d.ultg.toLowerCase().includes(q));
       document.getElementById("ms-count-induk").textContent = fmtNum(indRows.length);
 
       document.getElementById("ms-tbody-induk").innerHTML = indRows.map((d, i) => `
@@ -4082,11 +4213,10 @@
         </tr>
       `;
 
-      const qAss = msState.searchAsset.trim().toLowerCase();
       const assets = filtered.filter(r => {
         if (msState.statusBtn === "ANOMALI" && !isAnomaliKondisi(r.kon)) return false;
         else if (msState.statusBtn !== "ALL" && msState.statusBtn !== "ANOMALI" && r.st26 !== msState.statusBtn) return false;
-        if (qAss && !(r.loc.toLowerCase().includes(qAss) || r.i.toLowerCase().includes(qAss) || r.id.toLowerCase().includes(qAss) || r.u.toLowerCase().includes(qAss))) return false;
+        if (q && !(r.loc.toLowerCase().includes(q) || r.i.toLowerCase().includes(q) || r.id.toLowerCase().includes(q) || r.u.toLowerCase().includes(q) || r.kon.toLowerCase().includes(q))) return false;
         return true;
       });
       document.getElementById("ms-count-assets").textContent = `${fmtNum(assets.length)} baris`;
@@ -4130,11 +4260,28 @@
       document.getElementById("ms-btn-next").disabled = msState.page >= maxPage;
     }
 
+    function switchMsTableTab(tab) {
+      msState.activeTab = tab;
+      const isInduk = tab === "induk";
+      document.getElementById("ms-wrap-induk").classList.toggle("hidden", !isInduk);
+      document.getElementById("ms-wrap-assets").classList.toggle("hidden", isInduk);
+      document.getElementById("ms-limit").classList.toggle("hidden", isInduk);
+      document.getElementById("ms-quick-status-bar").classList.toggle("hidden", isInduk);
+      document.getElementById("ms-pagination-wrap").classList.toggle("hidden", isInduk);
+      document.getElementById("ms-tab-btn-induk").className = isInduk
+        ? "px-4 py-2 rounded-xl text-xs font-bold bg-cyan-500 text-slate-950 transition"
+        : "px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
+      document.getElementById("ms-tab-btn-assets").className = !isInduk
+        ? "px-4 py-2 rounded-xl text-xs font-bold bg-cyan-500 text-slate-950 transition"
+        : "px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
+    }
+
     window.focusMsInduk = function (induk) {
       msState.induk = induk; msState.page = 1;
       document.getElementById("ms-induk").value = induk;
+      switchMsTableTab("assets");
       refreshMsView();
-      document.getElementById("section-ms-assets").scrollIntoView({ behavior: "smooth" });
+      document.getElementById("section-ms-tables").scrollIntoView({ behavior: "smooth" });
     };
 
     /* ======================================================================= */
@@ -5511,27 +5658,65 @@
     document.getElementById("ms-prio").addEventListener("change", e => { msState.prio = e.target.value; msState.page = 1; refreshMsView(); });
     document.getElementById("ms-skor-suhu").addEventListener("change", e => { msState.skorSuhu = e.target.value; msState.page = 1; refreshMsView(); });
     document.getElementById("ms-skor-delta").addEventListener("change", e => { msState.skorDelta = e.target.value; msState.page = 1; refreshMsView(); });
+    document.getElementById("ms-ph").addEventListener("change", e => { msState.ph = e.target.value; msState.page = 1; refreshMsView(); });
     document.getElementById("btn-reset-ms").addEventListener("click", () => {
       msState.year = "ALL"; msState.month = "ALL";
       msState.ultg = "ALL"; msState.induk = "ALL"; msState.kode = "ALL"; msState.st26 = "ALL"; msState.kon = "ALL";
-      msState.prio = "ALL"; msState.skorSuhu = "ALL"; msState.skorDelta = "ALL"; msState.searchInduk = ""; msState.statusBtn = "ALL"; msState.searchAsset = ""; msState.page = 1;
+      msState.prio = "ALL"; msState.skorSuhu = "ALL"; msState.skorDelta = "ALL"; msState.ph = "ALL"; msState.search = ""; msState.statusBtn = "ALL"; msState.page = 1;
       document.getElementById("ms-kode").value = "ALL"; document.getElementById("ms-st26").value = "ALL";
       document.getElementById("ms-kon").value = "ALL"; document.getElementById("ms-prio").value = "ALL";
       document.getElementById("ms-skor-suhu").value = "ALL"; document.getElementById("ms-skor-delta").value = "ALL";
-      document.getElementById("ms-search-induk").value = ""; document.getElementById("ms-search-asset").value = "";
+      document.getElementById("ms-ph").value = "ALL"; document.getElementById("ms-search").value = "";
       document.querySelectorAll(".ms-status-btn").forEach(b => {
-        b.className = b.dataset.msstatus === "ALL" ? "ms-status-btn px-2.5 py-1 rounded-lg font-bold bg-cyan-500 text-slate-950 transition" : "ms-status-btn px-2.5 py-1 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
+        b.className = b.dataset.msstatus === "ALL" ? "ms-status-btn px-3 py-1.5 rounded-xl font-bold bg-cyan-500 text-slate-950 transition" : "ms-status-btn px-3 py-1.5 rounded-xl font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
       });
       populateMsFilters(); refreshMsView();
     });
-    document.getElementById("ms-search-induk").addEventListener("input", e => { msState.searchInduk = e.target.value; renderMsTables(getFilteredMsRecords(false)); });
-    document.getElementById("ms-search-asset").addEventListener("input", e => { msState.searchAsset = e.target.value; msState.page = 1; renderMsTables(getFilteredMsRecords(false)); });
+    document.querySelectorAll(".ms-chartmode-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        msState.chartMode = btn.dataset.msmode;
+        document.querySelectorAll(".ms-chartmode-btn").forEach(b => {
+          b.className = b === btn ? "ms-chartmode-btn px-2.5 py-1 rounded-lg font-semibold bg-cyan-500 text-slate-950" : "ms-chartmode-btn px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white";
+        });
+        refreshMsView();
+      });
+    });
+    document.querySelectorAll(".ms-limit-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        msState.indukLimit = btn.dataset.mslimit;
+        document.querySelectorAll(".ms-limit-btn").forEach(b => {
+          b.className = b === btn ? "ms-limit-btn px-2.5 py-1 rounded-lg font-semibold bg-cyan-500 text-slate-950" : "ms-limit-btn px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white";
+        });
+        refreshMsView();
+      });
+    });
+    document.querySelectorAll(".ms-orient-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        msState.indukOrient = btn.dataset.msorient;
+        document.querySelectorAll(".ms-orient-btn").forEach(b => {
+          b.className = b === btn ? "ms-orient-btn px-2.5 py-1 rounded-lg font-semibold bg-sky-500 text-slate-950" : "ms-orient-btn px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white";
+        });
+        refreshMsView();
+      });
+    });
+    document.querySelectorAll(".ms-spanmode-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        msState.spanMode = btn.dataset.msspanmode;
+        document.querySelectorAll(".ms-spanmode-btn").forEach(b => {
+          b.className = b === btn ? "ms-spanmode-btn px-2.5 py-1 rounded-lg font-semibold bg-rose-500 text-white" : "ms-spanmode-btn px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white";
+        });
+        refreshMsView();
+      });
+    });
+    document.getElementById("ms-tab-btn-induk").addEventListener("click", () => switchMsTableTab("induk"));
+    document.getElementById("ms-tab-btn-assets").addEventListener("click", () => switchMsTableTab("assets"));
+    document.getElementById("ms-search").addEventListener("input", e => { msState.search = e.target.value; msState.page = 1; renderMsTables(getFilteredMsRecords(false)); });
     document.getElementById("ms-limit").addEventListener("change", e => { msState.limit = e.target.value; msState.page = 1; renderMsTables(getFilteredMsRecords(false)); });
     document.querySelectorAll(".ms-status-btn").forEach(btn => {
       btn.addEventListener("click", () => {
         msState.statusBtn = btn.dataset.msstatus; msState.page = 1;
         document.querySelectorAll(".ms-status-btn").forEach(b => {
-          b.className = b === btn ? "ms-status-btn px-2.5 py-1 rounded-lg font-bold bg-cyan-500 text-slate-950 transition" : "ms-status-btn px-2.5 py-1 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
+          b.className = b === btn ? "ms-status-btn px-3 py-1.5 rounded-xl font-bold bg-cyan-500 text-slate-950 transition" : "ms-status-btn px-3 py-1.5 rounded-xl font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
         });
         renderMsTables(getFilteredMsRecords(false));
       });
