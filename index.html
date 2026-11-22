@@ -169,13 +169,13 @@
       color: #e0f2fe !important;
     }
 
-    body.theme-pln .main-nav-tab:not(.active-de):not(.active-ms):not(.active-anomali):not(.active-thermo) {
+    body.theme-pln .main-nav-tab:not(.active-de):not(.active-ms):not(.active-anomali):not(.active-thermo):not(.active-realisasi) {
       background-color: #f1f5f9 !important;
       color: #1e293b !important;
       border-color: #cbd5e1 !important;
     }
 
-    body.theme-pln .main-nav-tab:not(.active-de):not(.active-ms):not(.active-anomali):not(.active-thermo):hover {
+    body.theme-pln .main-nav-tab:not(.active-de):not(.active-ms):not(.active-anomali):not(.active-thermo):not(.active-realisasi):hover {
       background-color: #e0f2fe !important;
       border-color: #0077b6 !important;
       color: #00529b !important;
@@ -542,24 +542,18 @@
           </div>
         </div>
 
-        <div class="flex flex-wrap items-center gap-2.5">
-          <!-- DROPDOWN MENU TAB 1-4 -->
+        <div class="flex flex-wrap items-center justify-end gap-2">
+          <!-- DROPDOWN MENU TAB 1-5 -->
           <div class="relative" id="tab-menu-container">
             <button id="btn-tab-menu-toggle" type="button"
-              class="px-3.5 py-2 rounded-xl text-xs font-extrabold bg-amber-400 hover:bg-amber-300 text-slate-950 shadow-lg flex items-center gap-2 transition">
+              class="px-3 py-1.5 rounded-xl text-xs font-extrabold bg-amber-400 hover:bg-amber-300 text-slate-950 shadow-lg flex items-center gap-1.5 transition">
               <span>☰</span>
               <span id="active-tab-menu-label">1. Thermo Dead End (C1)</span>
               <span class="text-[10px] opacity-80">▼</span>
             </button>
-          </div>
-
-          <button id="btn-quick-realisasi" type="button" onclick="switchMainView('realisasi')"
-            class="px-3.5 py-2 rounded-xl text-xs font-extrabold bg-indigo-600 hover:bg-indigo-500 text-white border border-indigo-400/50 shadow-lg flex items-center gap-1.5 transition">
-            <span>📊</span><span>Realisasi &amp; Detail Tower</span>
-          </button>
 
             <div id="tab-menu-popover"
-              class="hidden absolute right-0 sm:left-0 sm:right-auto mt-2 w-80 p-2 rounded-2xl bg-slate-900 border border-slate-700 shadow-2xl z-50 space-y-1.5">
+              class="hidden absolute right-0 mt-2 w-80 p-2 rounded-2xl bg-slate-900 border border-slate-700 shadow-2xl z-50 space-y-1.5">
               <div class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">Pilih Modul
                 Dashboard</div>
               <button id="main-tab-de" onclick="switchMainView('de')"
@@ -599,26 +593,31 @@
             </div>
           </div>
 
+          <button id="btn-quick-realisasi" type="button" onclick="switchMainView('realisasi')"
+            class="px-3 py-1.5 rounded-xl text-xs font-extrabold bg-indigo-600 hover:bg-indigo-500 text-white border border-indigo-400/50 shadow-lg flex items-center gap-1.5 transition">
+            <span>📊</span><span>Realisasi</span>
+          </button>
+
           <a id="sheet-link"
             href="https://docs.google.com/spreadsheets/d/1FkIuiePptGPfLoyEHdZhrWaz_CIp4GxyXYVuZEekAY8/edit?gid=400800348#gid=400800348"
             target="_blank" rel="noopener"
-            class="hidden px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-1.5 transition">
+            class="hidden px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 items-center gap-1.5 transition whitespace-nowrap">
             <span>📄</span><span id="sheet-link-label">Sheet: THERMO DEAD END</span>
           </a>
           <button id="btn-export-csv"
-            class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-emerald-600/90 hover:bg-emerald-500 text-white flex items-center gap-1.5 shadow-lg shadow-emerald-600/20 transition">
-            <span>📥</span><span>Export Rekap CSV</span>
+            class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-600/90 hover:bg-emerald-500 text-white flex items-center gap-1.5 shadow-lg shadow-emerald-600/20 transition whitespace-nowrap">
+            <span>📥</span><span>Export CSV</span>
           </button>
           <button id="btn-sync"
-            class="hidden px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 flex items-center gap-1.5 shadow-lg shadow-amber-500/25 transition">
+            class="hidden px-3 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 items-center gap-1.5 shadow-lg shadow-amber-500/25 transition whitespace-nowrap">
             <span id="sync-icon">🔄</span><span id="sync-text">Sinkronisasi 3 Sheet</span>
           </button>
           <button id="btn-theme-toggle" title="Ganti Tema Cerah PLN / Gelap"
-            class="px-3.5 py-2 rounded-xl text-xs font-bold bg-white/15 hover:bg-white/25 text-white border border-white/25 flex items-center gap-1.5 transition">
+            class="px-3 py-1.5 rounded-xl text-xs font-bold bg-white/15 hover:bg-white/25 text-white border border-white/25 flex items-center gap-1.5 transition whitespace-nowrap">
             <span id="theme-icon">🌙</span><span id="theme-label">Mode Gelap</span>
           </button>
           <button id="btn-logout" title="Keluar dari Dashboard"
-            class="px-3.5 py-2 rounded-xl text-xs font-bold bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 flex items-center gap-1.5 transition">
+            class="px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 flex items-center gap-1.5 transition whitespace-nowrap">
             <span>🚪</span><span>Keluar</span>
           </button>
         </div>
@@ -2862,7 +2861,9 @@
             rawPayload = await resp.json();
             initFromPayload(rawPayload);
             document.getElementById("btn-sync").classList.remove("hidden");
+            document.getElementById("btn-sync").classList.add("flex");
             document.getElementById("sheet-link").classList.remove("hidden");
+            document.getElementById("sheet-link").classList.add("flex");
             return;
           }
         } catch (_) { }
