@@ -59,6 +59,13 @@
       box-shadow: 0 4px 18px rgba(16, 185, 129, 0.35);
     }
 
+    .main-nav-tab.active-realisasi {
+      background: linear-gradient(135deg, #6366f1, #2563eb);
+      color: #ffffff;
+      border-color: #818cf8;
+      box-shadow: 0 4px 18px rgba(99, 102, 241, 0.35);
+    }
+
     .month-chip {
       transition: all 0.15s ease;
     }
@@ -525,7 +532,7 @@
               </h1>
               <span
                 class="px-2.5 py-0.5 text-[11px] font-bold rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                4 MODUL TERINTEGRASI
+                5 MODUL TERINTEGRASI
               </span>
             </div>
             <p class="text-xs text-slate-400 mt-0.5">
@@ -544,6 +551,12 @@
               <span id="active-tab-menu-label">1. Thermo Dead End (C1)</span>
               <span class="text-[10px] opacity-80">▼</span>
             </button>
+          </div>
+
+          <button id="btn-quick-realisasi" type="button" onclick="switchMainView('realisasi')"
+            class="px-3.5 py-2 rounded-xl text-xs font-extrabold bg-indigo-600 hover:bg-indigo-500 text-white border border-indigo-400/50 shadow-lg flex items-center gap-1.5 transition">
+            <span>📊</span><span>Realisasi &amp; Detail Tower</span>
+          </button>
 
             <div id="tab-menu-popover"
               class="hidden absolute right-0 sm:left-0 sm:right-auto mt-2 w-80 p-2 rounded-2xl bg-slate-900 border border-slate-700 shadow-2xl z-50 space-y-1.5">
@@ -575,6 +588,13 @@
                 <span class="flex items-center gap-2"><span>🌡️</span><span>4. Rekap Gabungan Thermovisi</span></span>
                 <span id="badge-nav-thermo"
                   class="px-2 py-0.5 text-[11px] rounded-full bg-emerald-500/20 text-emerald-300 font-bold">0</span>
+              </button>
+
+              <button id="main-tab-realisasi" onclick="switchMainView('realisasi')"
+                class="main-nav-tab w-full px-3.5 py-2.5 rounded-xl text-xs font-extrabold border border-slate-700 bg-slate-900 text-slate-300 hover:bg-slate-800 flex items-center justify-between gap-2 text-left">
+                <span class="flex items-center gap-2"><span>📊</span><span>5. Realisasi Thermovisi (ULTG, Penghantar &amp; Tower)</span></span>
+                <span id="badge-nav-realisasi"
+                  class="px-2 py-0.5 text-[11px] rounded-full bg-indigo-500/20 text-indigo-300 font-bold">0%</span>
               </button>
             </div>
           </div>
@@ -622,6 +642,9 @@
         <button onclick="switchMainView('thermo')"
           class="w-full px-3 py-2 rounded-xl text-xs font-bold text-left bg-slate-800/80 hover:bg-emerald-500 hover:text-slate-950 text-slate-200 transition">🌡️
           4. Rekap Gabungan Thermovisi</button>
+        <button onclick="switchMainView('realisasi')"
+          class="w-full px-3 py-2 rounded-xl text-xs font-bold text-left bg-slate-800/80 hover:bg-indigo-500 hover:text-white text-slate-200 transition">📊
+          5. Realisasi Thermovisi (Tower &amp; ULTG)</button>
       </div>
       <button id="btn-floating-tab-toggle" type="button"
         class="ml-auto px-4 py-2.5 rounded-full text-xs font-extrabold bg-[#00529b] hover:bg-[#0066b2] text-white border-2 border-[#ffd100] shadow-xl flex items-center gap-2 transition">
@@ -1956,6 +1979,367 @@
       </section>
     </main>
 
+    <!-- ======================================================================= -->
+    <!-- VIEW 5: REALISASI THERMOVISI (ULTG, PENGHANTAR & DETAIL TOWER)          -->
+    <!-- ======================================================================= -->
+    <main id="view-realisasi" class="hidden max-w-[1600px] mx-auto px-4 lg:px-6 pt-5 space-y-5">
+
+      <!-- FILTER REALISASI -->
+      <section class="glass-card rounded-2xl p-4 lg:p-5 shadow-xl">
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3.5 border-b border-slate-800">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-indigo-400 text-base">📊</span>
+            <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200">Monitoring Realisasi Thermovisi
+              (Per ULTG, Penghantar &amp; Detail Tower)</h2>
+            <span id="rl-filter-badge"
+              class="ml-2 px-2.5 py-0.5 text-[11px] font-semibold rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+              Semua Aset (C1, MJ &amp; RS)
+            </span>
+          </div>
+          <div class="flex items-center gap-3 flex-wrap">
+            <label class="inline-flex items-center gap-2 text-xs text-slate-300 cursor-pointer select-none">
+              <input type="checkbox" id="rl-hide-unmapped"
+                class="rounded bg-slate-800 border-slate-600 text-indigo-500 focus:ring-indigo-500" />
+              <span>Sembunyikan Aset Migrasi Belum Dipetakan (-)</span>
+            </label>
+            <button id="btn-reset-rl"
+              class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">
+              Reset Filter
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+          <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-indigo-400 mb-1.5">🔩 Jenis Aset
+              Thermovisi</label>
+            <select id="rl-jenis"
+              class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white font-semibold focus:outline-none focus:border-indigo-500">
+              <option value="ALL">Semua Aset (C1 + MJ + RS)</option>
+              <option value="C1">C1 — Dead End Clamp</option>
+              <option value="MJ_RS">MJ + RS — Midspan &amp; Repair Sleeve</option>
+              <option value="MJ">MJ — Midspan Joint Saja</option>
+              <option value="RS">RS — Repair Sleeve Saja</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">🏢 Filter
+              ULTG</label>
+            <select id="rl-ultg"
+              class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-indigo-500">
+              <option value="ALL">Semua ULTG</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">⚡ Filter
+              Penghantar</label>
+            <select id="rl-induk"
+              class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-indigo-500">
+              <option value="ALL">Semua Penghantar</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">🗼 Status
+              Realisasi Tower / Span</label>
+            <select id="rl-tower-status"
+              class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-indigo-500">
+              <option value="ALL">Semua Status Tower / Span</option>
+              <option value="LENGKAP">✅ Sudah Realisasi (Lengkap 100%)</option>
+              <option value="SEBAGIAN">🟡 Realisasi Sebagian</option>
+              <option value="BELUM">⚪ Belum Realisasi (0%)</option>
+              <option value="BELUM_LENGKAP">🚨 Belum Lengkap (Sebagian + Belum)</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- KARTU KPI REALISASI -->
+      <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div class="glass-card rounded-2xl p-4 border-l-4 border-l-indigo-500">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Target Titik Aset</span>
+            <span class="text-lg">🎯</span>
+          </div>
+          <div id="rl-kpi-total" class="text-2xl lg:text-3xl font-extrabold text-white mt-1.5">0</div>
+          <div id="rl-kpi-total-sub" class="text-[11px] text-slate-400 mt-1">0 Tower / Span unik</div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-4 border-l-4 border-l-emerald-500">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Titik Sudah Realisasi</span>
+            <span class="text-lg">✅</span>
+          </div>
+          <div id="rl-kpi-upd" class="text-2xl lg:text-3xl font-extrabold text-emerald-400 mt-1.5">0</div>
+          <div id="rl-kpi-upd-sub" class="text-[11px] text-slate-400 mt-1">0% Realisasi (Data Update 2026)</div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-4 border-l-4 border-l-rose-500">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Titik Belum Realisasi</span>
+            <span class="text-lg">⏳</span>
+          </div>
+          <div id="rl-kpi-belum" class="text-2xl lg:text-3xl font-extrabold text-rose-400 mt-1.5">0</div>
+          <div id="rl-kpi-belum-sub" class="text-[11px] text-slate-400 mt-1">Cek Kembali: 0 • Data Kosong: 0</div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-4 border-l-4 border-l-sky-500">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Tower / Span Sudah Uji</span>
+            <span class="text-lg">🗼</span>
+          </div>
+          <div id="rl-kpi-tw-done" class="text-2xl lg:text-3xl font-extrabold text-sky-400 mt-1.5">0</div>
+          <div id="rl-kpi-tw-done-sub" class="text-[11px] text-slate-400 mt-1">Lengkap: 0 • Sebagian: 0</div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-4 border-l-4 border-l-amber-500">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Tower / Span Belum Uji</span>
+            <span class="text-lg">⚠️</span>
+          </div>
+          <div id="rl-kpi-tw-none" class="text-2xl lg:text-3xl font-extrabold text-amber-400 mt-1.5">0</div>
+          <div id="rl-kpi-tw-none-sub" class="text-[11px] text-slate-400 mt-1">0% tower belum tersentuh uji</div>
+        </div>
+      </section>
+
+      <!-- GRAFIK 1 (REALISASI PER ULTG) & GRAFIK 2 (STATUS TOWER) -->
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div class="glass-card rounded-2xl p-5 lg:col-span-2 shadow-xl">
+          <div class="pb-3 mb-3 border-b border-slate-800">
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 text-[10px] font-extrabold uppercase rounded bg-indigo-500 text-white">GRAFIK 1
+                • PER ULTG</span>
+              <h3 class="text-sm lg:text-base font-bold text-white">Grafik Realisasi Thermovisi Per ULTG (Sudah vs
+                Belum)</h3>
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">Membandingkan titik Sudah Realisasi (Data Update), Cek Kembali,
+              dan Belum Realisasi per ULTG. <strong class="text-indigo-300">Klik batang ULTG</strong> untuk memfilter.</p>
+          </div>
+          <div class="relative w-full" style="height: 320px;">
+            <canvas id="chart-rl-ultg"></canvas>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-5 shadow-xl">
+          <div class="pb-3 mb-3 border-b border-slate-800">
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 text-[10px] font-extrabold uppercase rounded bg-emerald-500 text-slate-950">GRAFIK
+                2 • STATUS TOWER</span>
+              <h3 class="text-sm lg:text-base font-bold text-white">Proporsi Realisasi Tower / Span</h3>
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">Sebaran tower yang sudah realisasi penuh, sebagian, atau belum
+              sama sekali (klik segmen untuk filter).</p>
+          </div>
+          <div class="relative w-full" style="height: 320px;">
+            <canvas id="chart-rl-tower-dist"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- GRAFIK 3 (REALISASI PER PENGHANTAR) -->
+      <section class="glass-card rounded-2xl p-5 shadow-xl">
+        <div class="flex flex-wrap items-center justify-between gap-3 pb-4 mb-4 border-b border-slate-800">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 text-[10px] font-extrabold uppercase rounded bg-sky-500 text-slate-950">GRAFIK 3
+                • PER PENGHANTAR</span>
+              <h2 class="text-base lg:text-lg font-extrabold text-white">
+                Grafik Realisasi Thermovisi Tiap Penghantar (Sudah vs Belum)
+              </h2>
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">
+              Pantau progres realisasi per segmen penghantar. <strong class="text-indigo-300">Klik batang
+                penghantar</strong> untuk memfilter detail towernya di bawah.
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="inline-flex rounded-xl bg-slate-900 p-1 border border-slate-700 text-xs">
+              <button data-rlsort="pct_asc"
+                class="rl-sort-btn px-2.5 py-1 rounded-lg font-semibold bg-indigo-500 text-white">% Terendah</button>
+              <button data-rlsort="pct_desc"
+                class="rl-sort-btn px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white">%
+                Tertinggi</button>
+              <button data-rlsort="total_desc"
+                class="rl-sort-btn px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white">Target
+                Terbanyak</button>
+            </div>
+            <div class="inline-flex rounded-xl bg-slate-900 p-1 border border-slate-700 text-xs">
+              <button data-rllimit="15"
+                class="rl-limit-btn px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white">Top
+                15</button>
+              <button data-rllimit="25"
+                class="rl-limit-btn px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white">Top
+                25</button>
+              <button data-rllimit="ALL"
+                class="rl-limit-btn px-2.5 py-1 rounded-lg font-semibold bg-indigo-500 text-white">Semua</button>
+            </div>
+            <div class="inline-flex rounded-xl bg-slate-900 p-1 border border-slate-700 text-xs">
+              <button data-rlorient="vertical"
+                class="rl-orient-btn px-2.5 py-1 rounded-lg font-semibold bg-sky-500 text-slate-950">Batang
+                Tegak</button>
+              <button data-rlorient="horizontal"
+                class="rl-orient-btn px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white">Batang
+                Mendatar</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="rl-induk-chart-wrapper" class="relative w-full" style="height: 460px;">
+          <canvas id="chart-rl-induk"></canvas>
+        </div>
+      </section>
+
+      <!-- TABEL DETAIL REALISASI (PER TOWER / PER PENGHANTAR / PER TITIK) -->
+      <section id="section-rl-tables" class="glass-card rounded-2xl p-5 shadow-xl">
+        <div class="flex flex-wrap items-center justify-between gap-3 pb-4 mb-4 border-b border-slate-800">
+          <div class="flex flex-wrap items-center gap-2">
+            <button id="rl-tab-btn-tower"
+              class="px-4 py-2 rounded-xl text-xs font-bold bg-indigo-500 text-white transition">
+              🗼 Detail Tower / Span: Sudah vs Belum (<span id="rl-count-tower">0</span>)
+            </button>
+            <button id="rl-tab-btn-induk"
+              class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">
+              📋 Rekap Per Penghantar (<span id="rl-count-induk">0</span>)
+            </button>
+            <button id="rl-tab-btn-assets"
+              class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">
+              🔩 Rincian Titik Klem / IDEQP (<span id="rl-count-assets">0</span>)
+            </button>
+          </div>
+          <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+            <input id="rl-search" type="text" placeholder="Cari Tower (#0012), Penghantar, ULTG, atau IDEQP..."
+              class="w-full sm:w-80 px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white focus:outline-none focus:border-indigo-500" />
+            <select id="rl-limit"
+              class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white focus:outline-none">
+              <option value="25">25 baris</option>
+              <option value="50" selected>50 baris</option>
+              <option value="100">100 baris</option>
+              <option value="250">250 baris</option>
+              <option value="ALL">Semua</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="rl-quick-tower-bar" class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div class="flex flex-wrap items-center gap-1.5 text-xs">
+            <span class="text-slate-400 font-semibold mr-1">Filter Cepat Tower:</span>
+            <button data-rltwstatus="ALL"
+              class="rl-twstatus-btn px-3 py-1.5 rounded-xl font-bold bg-indigo-500 text-white transition">Semua
+              Tower</button>
+            <button data-rltwstatus="LENGKAP"
+              class="rl-twstatus-btn px-3 py-1.5 rounded-xl font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">✅
+              Sudah Realisasi</button>
+            <button data-rltwstatus="SEBAGIAN"
+              class="rl-twstatus-btn px-3 py-1.5 rounded-xl font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">🟡
+              Sebagian</button>
+            <button data-rltwstatus="BELUM"
+              class="rl-twstatus-btn px-3 py-1.5 rounded-xl font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">⚪
+              Belum Realisasi</button>
+            <button data-rltwstatus="BELUM_LENGKAP"
+              class="rl-twstatus-btn px-3 py-1.5 rounded-xl font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">🚨
+              Belum Lengkap</button>
+          </div>
+          <button id="btn-export-rl-csv"
+            class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1.5 transition">
+            <span>📥</span><span>Export Detail Realisasi (CSV)</span>
+          </button>
+        </div>
+
+        <!-- SUBTAB 1 RL: DETAIL TOWER / SPAN -->
+        <div id="rl-wrap-tower" class="overflow-x-auto max-h-[540px]">
+          <table class="w-full text-left border-collapse text-xs whitespace-nowrap">
+            <thead
+              class="sticky top-0 bg-slate-900 text-slate-300 uppercase text-[11px] border-b border-slate-700 z-10">
+              <tr>
+                <th class="py-3 px-3">No</th>
+                <th class="py-3 px-3">ULTG</th>
+                <th class="py-3 px-3">Penghantar</th>
+                <th class="py-3 px-3">Tower / Span (Functloc)</th>
+                <th class="py-3 px-3">Jenis Aset</th>
+                <th class="py-3 px-3 text-right">Target Titik</th>
+                <th class="py-3 px-3 text-right text-emerald-400">Sudah Realisasi</th>
+                <th class="py-3 px-3 text-right text-amber-300">Cek Kembali</th>
+                <th class="py-3 px-3 text-right text-slate-400">Belum Realisasi</th>
+                <th class="py-3 px-3 text-right text-sky-300">% Realisasi</th>
+                <th class="py-3 px-3">Status Tower</th>
+                <th class="py-3 px-3">Tgl Uji Terakhir</th>
+                <th class="py-3 px-3">Kondisi</th>
+                <th class="py-3 px-3 text-right text-orange-300">Max Suhu (°C)</th>
+                <th class="py-3 px-3 text-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="rl-tbody-tower" class="divide-y divide-slate-800/80 text-slate-200"></tbody>
+          </table>
+        </div>
+
+        <!-- SUBTAB 2 RL: REKAP PER PENGHANTAR -->
+        <div id="rl-wrap-induk" class="hidden overflow-x-auto max-h-[540px]">
+          <table class="w-full text-left border-collapse text-xs whitespace-nowrap">
+            <thead
+              class="sticky top-0 bg-slate-900 text-slate-300 uppercase text-[11px] border-b border-slate-700 z-10">
+              <tr>
+                <th class="py-3 px-3">Rank</th>
+                <th class="py-3 px-3">Penghantar</th>
+                <th class="py-3 px-3">ULTG</th>
+                <th class="py-3 px-3 text-right">Target Titik</th>
+                <th class="py-3 px-3 text-right text-emerald-400">Sudah Realisasi</th>
+                <th class="py-3 px-3 text-right text-amber-300">Cek Kembali</th>
+                <th class="py-3 px-3 text-right text-slate-400">Belum Realisasi</th>
+                <th class="py-3 px-3 text-right text-sky-300">% Titik</th>
+                <th class="py-3 px-3 text-right">Total Tower/Span</th>
+                <th class="py-3 px-3 text-right text-emerald-300">Tower Lengkap</th>
+                <th class="py-3 px-3 text-right text-amber-300">Sebagian</th>
+                <th class="py-3 px-3 text-right text-rose-400">Tower Belum</th>
+                <th class="py-3 px-3 text-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="rl-tbody-induk" class="divide-y divide-slate-800/80 text-slate-200"></tbody>
+            <tfoot id="rl-tfoot-induk"
+              class="sticky bottom-0 bg-slate-900 font-bold text-white border-t-2 border-indigo-500/50"></tfoot>
+          </table>
+        </div>
+
+        <!-- SUBTAB 3 RL: RINCIAN TITIK IDEQP -->
+        <div id="rl-wrap-assets" class="hidden overflow-x-auto max-h-[540px]">
+          <table class="w-full text-left border-collapse text-xs whitespace-nowrap">
+            <thead
+              class="sticky top-0 bg-slate-900 text-slate-300 uppercase text-[11px] border-b border-slate-700 z-10">
+              <tr>
+                <th class="py-3 px-3">No</th>
+                <th class="py-3 px-3">Jenis</th>
+                <th class="py-3 px-3">ULTG</th>
+                <th class="py-3 px-3">Penghantar</th>
+                <th class="py-3 px-3">Tower / Span (Functloc)</th>
+                <th class="py-3 px-3">IDEQP</th>
+                <th class="py-3 px-3">Phasa</th>
+                <th class="py-3 px-3">Line</th>
+                <th class="py-3 px-3">Tanggal Uji</th>
+                <th class="py-3 px-3 text-right text-orange-300">Suhu Objek</th>
+                <th class="py-3 px-3 text-right text-sky-300">ΔT (°C)</th>
+                <th class="py-3 px-3">Kondisi</th>
+                <th class="py-3 px-3">Status Realisasi</th>
+              </tr>
+            </thead>
+            <tbody id="rl-tbody-assets" class="divide-y divide-slate-800/80 text-slate-200"></tbody>
+          </table>
+        </div>
+
+        <div id="rl-pagination-wrap"
+          class="flex flex-wrap items-center justify-between gap-3 pt-3 mt-3 border-t border-slate-800 text-xs text-slate-400">
+          <div id="rl-pagination-info">Menampilkan 0 – 0 dari 0 baris</div>
+          <div class="flex items-center gap-2">
+            <button id="rl-btn-prev"
+              class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 hover:bg-slate-800 text-slate-300 font-semibold disabled:opacity-40 disabled:cursor-not-allowed">◀
+              Sebelumnya</button>
+            <span id="rl-page-label" class="px-2 font-bold text-slate-200">Hal 1 dari 1</span>
+            <button id="rl-btn-next"
+              class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 hover:bg-slate-800 text-slate-300 font-semibold disabled:opacity-40 disabled:cursor-not-allowed">Selanjutnya
+              ▶</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
   </div><!-- END #app-shell -->
 
   <script>
@@ -2090,6 +2474,27 @@
     let currentAnLocList = [];
     let currentThIndukList = [];
 
+    const rlState = {
+      jenis: "ALL",
+      ultg: "ALL",
+      induk: "ALL",
+      towerStatus: "ALL",
+      hideUnmapped: false,
+      indukSort: "pct_asc",
+      indukLimit: "ALL",
+      indukOrient: "vertical",
+      activeTab: "tower",
+      search: "",
+      limit: "50",
+      page: 1
+    };
+    let chartRlUltg = null;
+    let chartRlTowerDist = null;
+    let chartRlInduk = null;
+    let currentRlTowerList = [];
+    let currentRlIndukList = [];
+    let currentRlAssetList = [];
+
     function fmtNum(n) {
       return Number(n || 0).toLocaleString("id-ID");
     }
@@ -2157,6 +2562,7 @@
       document.getElementById("view-ms").classList.toggle("hidden", view !== "ms");
       document.getElementById("view-anomali").classList.toggle("hidden", view !== "anomali");
       document.getElementById("view-thermo").classList.toggle("hidden", view !== "thermo");
+      document.getElementById("view-realisasi").classList.toggle("hidden", view !== "realisasi");
 
       const baseInactive = "main-nav-tab w-full px-3.5 py-2.5 rounded-xl text-xs font-extrabold border border-slate-700 bg-slate-900 text-slate-300 hover:bg-slate-800 flex items-center justify-between gap-2 text-left";
       const baseActive = "main-nav-tab w-full px-3.5 py-2.5 rounded-xl text-xs font-extrabold border border-slate-700 flex items-center justify-between gap-2 text-left";
@@ -2164,12 +2570,14 @@
       document.getElementById("main-tab-ms").className = view === "ms" ? `${baseActive} active-ms` : baseInactive;
       document.getElementById("main-tab-anomali").className = view === "anomali" ? `${baseActive} active-anomali` : baseInactive;
       document.getElementById("main-tab-thermo").className = view === "thermo" ? `${baseActive} active-thermo` : baseInactive;
+      document.getElementById("main-tab-realisasi").className = view === "realisasi" ? `${baseActive} active-realisasi` : baseInactive;
 
       const labelMap = {
         de: "1. Thermo Dead End (C1)",
         ms: "2. Thermo Midspan & Repair Sleeve (MJ & RS)",
         anomali: "3. Anomali & Suhu Kritis",
-        thermo: "4. Rekap Gabungan Thermovisi"
+        thermo: "4. Rekap Gabungan Thermovisi",
+        realisasi: "5. Realisasi Thermovisi"
       };
       const activeLabelEl = document.getElementById("active-tab-menu-label");
       if (activeLabelEl && labelMap[view]) activeLabelEl.textContent = labelMap[view];
@@ -2193,6 +2601,10 @@
         sheetLink.href = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/edit?gid=${GID_THERMOVISI}#gid=${GID_THERMOVISI}`;
         sheetLabel.textContent = "Sheet: THERMOVISI (Anomali)";
         refreshAnomaliView();
+      } else if (view === "realisasi") {
+        sheetLink.href = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/edit?gid=${GID_THERMO_DEADEND}#gid=${GID_THERMO_DEADEND}`;
+        sheetLabel.textContent = "Sheet: DEAD END & MIDSPAN";
+        refreshRlView();
       } else {
         sheetLink.href = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/edit?gid=${GID_THERMOVISI}#gid=${GID_THERMOVISI}`;
         sheetLabel.textContent = "Sheet: THERMOVISI";
@@ -2483,19 +2895,26 @@
       document.getElementById("sync-timestamp").textContent = `(Update: ${meta.synced_at || "-"})`;
 
       const anomaliCount = allThermoRecords.filter(r => isAnomaliKondisi(r.k)).length;
+      const rlTotalAll = allDeadEndRecords.length + allMidspanRecords.length;
+      const rlUpdAll = allDeadEndRecords.filter(r => r.st26 === "Data Update").length + allMidspanRecords.filter(r => r.st26 === "Data Update").length;
+      const rlPctAll = rlTotalAll > 0 ? ((rlUpdAll / rlTotalAll) * 100).toFixed(1) : "0.0";
       document.getElementById("badge-nav-de").textContent = `${fmtNum(allDeadEndRecords.length)} Titik C1`;
       document.getElementById("badge-nav-ms").textContent = `${fmtNum(allMidspanRecords.length)} MJ/RS`;
       document.getElementById("badge-nav-anomali").textContent = `${fmtNum(anomaliCount)} Anomali`;
       document.getElementById("badge-nav-thermo").textContent = `${fmtNum(allThermoRecords.length)} Uji`;
+      const badgeRlEl = document.getElementById("badge-nav-realisasi");
+      if (badgeRlEl) badgeRlEl.textContent = `${rlPctAll}%`;
 
       populateDeFilters();
       populateMsFilters();
       populateAnomaliFilters();
       populateThermoFilters();
+      populateRlFilters();
 
       if (activeMainView === "de") refreshDeView();
       else if (activeMainView === "ms") refreshMsView();
       else if (activeMainView === "anomali") refreshAnomaliView();
+      else if (activeMainView === "realisasi") refreshRlView();
       else refreshThermoView();
     }
 
@@ -4228,11 +4647,568 @@
           ["No", "Tanggal", "ULTG", "Penghantar", "Lokasi", "PST", "IDEQP", "Phasa", "Line", "Suhu Objek", "Suhu Kawat", "Delta T", "Arus Max", "Arus Shot", "Delta I Max", "Delta I Shot", "Kondisi", "Catatan"],
           rows.map((r, i) => [i + 1, r.dt, r.u, r.i, r.loc, r.pst, r.id, r.ph, r.ln, r.tobj ?? "", r.tkwt ?? "", r.dt_val ?? "", r.imax ?? "", r.ishot ?? "", r.dimax ?? "", r.dishot ?? "", r.k, r.cat])
         );
+      } else if (activeMainView === "realisasi") {
+        exportRlCsv();
       } else {
         downloadCsvRows(
           `Rekap_Thermovisi_Per_Penghantar_${today}.csv`,
           ["Rank", "Penghantar", "ULTG", "C1", "MJ", "RS", "Total Uji", "Baik", "Periksa Saat Har", "Perbaiki < 3 Bln", "No Data", "% Anomali", "Max Suhu (C)", "Max Delta T (C)"],
           currentThIndukList.map((d, i) => [i + 1, d.induk, d.ultg, d.c1, d.mj, d.rs, d.total, d.baik, d.har, d.perbaiki, d.nodata, d.pctAnomali.toFixed(1), d.maxTemp ?? "", d.maxDt ?? ""])
+        );
+      }
+    }
+
+    /* ======================================================================= */
+    /* TAB 5: REALISASI THERMOVISI (PER ULTG, PENGHANTAR & DETAIL TOWER)       */
+    /* ======================================================================= */
+    function getRlCombinedRecords() {
+      const jenis = rlState.jenis;
+      const out = [];
+      if (jenis === "ALL" || jenis === "C1") {
+        for (const r of allDeadEndRecords) out.push({ ...r, _jenis: "C1" });
+      }
+      if (jenis === "ALL" || jenis === "MJ_RS" || jenis === "MJ" || jenis === "RS") {
+        for (const r of allMidspanRecords) {
+          const j = String(r.k || "MJ").toUpperCase();
+          if (jenis === "MJ" && j !== "MJ") continue;
+          if (jenis === "RS" && j !== "RS") continue;
+          out.push({ ...r, _jenis: j });
+        }
+      }
+      return out.filter(r => !rlState.hideUnmapped || r.i !== "(Belum Dipetakan / Migrasi NS)");
+    }
+
+    function populateRlFilters() {
+      const base = getRlCombinedRecords();
+      const ultgs = Array.from(new Set(base.map(r => r.u).filter(Boolean))).sort();
+      const selU = document.getElementById("rl-ultg");
+      const prevU = rlState.ultg;
+      selU.innerHTML = `<option value="ALL">Semua ULTG (${ultgs.length})</option>`;
+      ultgs.forEach(u => {
+        const opt = document.createElement("option");
+        opt.value = u; opt.textContent = u;
+        selU.appendChild(opt);
+      });
+      selU.value = ultgs.includes(prevU) ? prevU : "ALL";
+      rlState.ultg = selU.value;
+
+      const induks = Array.from(
+        new Set(base.filter(r => rlState.ultg === "ALL" || r.u === rlState.ultg).map(r => r.i).filter(Boolean))
+      ).sort();
+      const selI = document.getElementById("rl-induk");
+      const prevI = rlState.induk;
+      selI.innerHTML = `<option value="ALL">Semua Penghantar (${induks.length})</option>`;
+      induks.forEach(i => {
+        const opt = document.createElement("option");
+        opt.value = i; opt.textContent = i;
+        selI.appendChild(opt);
+      });
+      selI.value = induks.includes(prevI) ? prevI : "ALL";
+      rlState.induk = selI.value;
+    }
+
+    function rlTowerStatusBadge(st) {
+      if (st === "LENGKAP") return `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">✅ Sudah Realisasi</span>`;
+      if (st === "SEBAGIAN") return `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">🟡 Realisasi Sebagian</span>`;
+      return `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-700/60 text-slate-300 border border-slate-600">⚪ Belum Realisasi</span>`;
+    }
+
+    function matchRlTowerStatusFilter(twStatus, filterVal) {
+      if (filterVal === "ALL") return true;
+      if (filterVal === "BELUM_LENGKAP") return twStatus === "SEBAGIAN" || twStatus === "BELUM";
+      return twStatus === filterVal;
+    }
+
+    function refreshRlView() {
+      const jenisLabels = { ALL: "Semua Aset (C1, MJ & RS)", C1: "Dead End (C1)", MJ_RS: "Midspan & Repair Sleeve", MJ: "Midspan (MJ)", RS: "Repair Sleeve (RS)" };
+      const ultgText = rlState.ultg === "ALL" ? "Semua ULTG" : rlState.ultg;
+      document.getElementById("rl-filter-badge").textContent =
+        `${jenisLabels[rlState.jenis] || "Semua"} • ${ultgText}${rlState.induk !== "ALL" ? " • " + rlState.induk : ""}`;
+
+      const base = getRlCombinedRecords().filter(r => {
+        if (rlState.ultg !== "ALL" && r.u !== rlState.ultg) return false;
+        if (rlState.induk !== "ALL" && r.i !== rlState.induk) return false;
+        return true;
+      });
+
+      const towerMap = new Map();
+      for (const r of base) {
+        const key = `${r.i}||${r.loc}`;
+        let tw = towerMap.get(key);
+        if (!tw) {
+          tw = {
+            key, ultg: r.u, induk: r.i, loc: r.loc, towerNum: extractTowerNumber(r.loc),
+            jenisSet: new Set(), total: 0, upd: 0, cek: 0, kos: 0,
+            lastDt: "", worstKon: "BELUM UJI", maxTemp: null, records: []
+          };
+          towerMap.set(key, tw);
+        }
+        tw.jenisSet.add(r._jenis);
+        tw.total++;
+        if (r.st26 === "Data Update") tw.upd++;
+        else if (r.st26 === "Cek Kembali") tw.cek++;
+        else tw.kos++;
+        if (r.dt && r.dt > tw.lastDt) tw.lastDt = r.dt;
+        if (r.tobj !== null && (tw.maxTemp === null || r.tobj > tw.maxTemp)) tw.maxTemp = r.tobj;
+        const konRank = k => k === "PERBAIKI < 3 BLN" ? 4 : k === "PERIKSA SAAT HAR" ? 3 : k === "BAIK" ? 2 : k === "NO DATA" ? 1 : 0;
+        if (konRank(r.kon) > konRank(tw.worstKon)) tw.worstKon = r.kon;
+        tw.records.push(r);
+      }
+
+      const allTowers = Array.from(towerMap.values()).map(tw => {
+        const belum = tw.cek + tw.kos;
+        const pct = tw.total > 0 ? (tw.upd / tw.total) * 100 : 0;
+        const status = tw.upd === 0 ? "BELUM" : (tw.upd >= tw.total ? "LENGKAP" : "SEBAGIAN");
+        return {
+          ...tw,
+          jenisLabel: Array.from(tw.jenisSet).sort().join("+"),
+          belum,
+          pct,
+          status
+        };
+      });
+
+      const filteredTowers = allTowers.filter(tw => matchRlTowerStatusFilter(tw.status, rlState.towerStatus));
+      filteredTowers.sort((a, b) => {
+        const ord = s => s === "BELUM" ? 0 : s === "SEBAGIAN" ? 1 : 2;
+        return (ord(a.status) - ord(b.status)) || a.induk.localeCompare(b.induk) || (a.towerNum - b.towerNum) || a.loc.localeCompare(b.loc);
+      });
+      currentRlTowerList = filteredTowers;
+
+      const filteredAssets = [];
+      const indukMap = new Map();
+      const ultgMap = new Map();
+      let twLengkap = 0, twSebagian = 0, twBelum = 0;
+
+      for (const tw of filteredTowers) {
+        if (tw.status === "LENGKAP") twLengkap++;
+        else if (tw.status === "SEBAGIAN") twSebagian++;
+        else twBelum++;
+
+        let im = indukMap.get(tw.induk);
+        if (!im) {
+          im = { induk: tw.induk, ultg: tw.ultg, total: 0, upd: 0, cek: 0, kos: 0, twTotal: 0, twLengkap: 0, twSebagian: 0, twBelum: 0 };
+          indukMap.set(tw.induk, im);
+        }
+        im.total += tw.total; im.upd += tw.upd; im.cek += tw.cek; im.kos += tw.kos;
+        im.twTotal++;
+        if (tw.status === "LENGKAP") im.twLengkap++;
+        else if (tw.status === "SEBAGIAN") im.twSebagian++;
+        else im.twBelum++;
+
+        const uKey = tw.ultg || "(Belum Dipetakan)";
+        let um = ultgMap.get(uKey);
+        if (!um) {
+          um = { ultg: uKey, total: 0, upd: 0, cek: 0, kos: 0 };
+          ultgMap.set(uKey, um);
+        }
+        um.total += tw.total; um.upd += tw.upd; um.cek += tw.cek; um.kos += tw.kos;
+
+        for (const r of tw.records) filteredAssets.push(r);
+      }
+
+      currentRlAssetList = filteredAssets;
+      currentRlIndukList = Array.from(indukMap.values()).map(d => ({
+        ...d,
+        belumTotal: d.cek + d.kos,
+        pctReal: d.total > 0 ? (d.upd / d.total) * 100 : 0
+      }));
+      if (rlState.indukSort === "pct_desc") {
+        currentRlIndukList.sort((a, b) => (b.pctReal - a.pctReal) || (b.total - a.total));
+      } else if (rlState.indukSort === "total_desc") {
+        currentRlIndukList.sort((a, b) => (b.total - a.total) || (a.pctReal - b.pctReal));
+      } else {
+        currentRlIndukList.sort((a, b) => (a.pctReal - b.pctReal) || (b.belumTotal - a.belumTotal) || (b.total - a.total));
+      }
+
+      const totPts = filteredAssets.length;
+      const updPts = filteredAssets.filter(r => r.st26 === "Data Update").length;
+      const cekPts = filteredAssets.filter(r => r.st26 === "Cek Kembali").length;
+      const kosPts = totPts - updPts - cekPts;
+      const pctPts = totPts > 0 ? ((updPts / totPts) * 100).toFixed(1) : "0.0";
+      const totTw = filteredTowers.length;
+      const pctTwBelum = totTw > 0 ? ((twBelum / totTw) * 100).toFixed(1) : "0.0";
+
+      document.getElementById("rl-kpi-total").textContent = fmtNum(totPts);
+      document.getElementById("rl-kpi-total-sub").textContent = `${fmtNum(totTw)} Tower / Span unik`;
+      document.getElementById("rl-kpi-upd").textContent = fmtNum(updPts);
+      document.getElementById("rl-kpi-upd-sub").textContent = `${pctPts}% Realisasi (Data Update 2026)`;
+      document.getElementById("rl-kpi-belum").textContent = fmtNum(cekPts + kosPts);
+      document.getElementById("rl-kpi-belum-sub").textContent = `Cek Kembali: ${fmtNum(cekPts)} • Data Kosong: ${fmtNum(kosPts)}`;
+      document.getElementById("rl-kpi-tw-done").textContent = fmtNum(twLengkap + twSebagian);
+      document.getElementById("rl-kpi-tw-done-sub").textContent = `Lengkap: ${fmtNum(twLengkap)} • Sebagian: ${fmtNum(twSebagian)}`;
+      document.getElementById("rl-kpi-tw-none").textContent = fmtNum(twBelum);
+      document.getElementById("rl-kpi-tw-none-sub").textContent = `${pctTwBelum}% dari ${fmtNum(totTw)} tower belum uji`;
+
+      renderRlUltgChart(ultgMap);
+      renderRlTowerDistChart(twLengkap, twSebagian, twBelum);
+      renderRlIndukChart(currentRlIndukList);
+      renderRlTables();
+    }
+
+    function renderRlUltgChart(ultgMap) {
+      const entries = Array.from(ultgMap.values()).sort((a, b) => b.total - a.total);
+      const labels = entries.map(d => {
+        const pct = d.total > 0 ? ((d.upd / d.total) * 100).toFixed(1) : "0.0";
+        return `${d.ultg.replace(/^ULTG\s+/i, "")} (${pct}%)`;
+      });
+      const ctx = document.getElementById("chart-rl-ultg").getContext("2d");
+      if (chartRlUltg) chartRlUltg.destroy();
+
+      chartRlUltg = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels,
+          datasets: [
+            { label: "Sudah Realisasi (Data Update)", data: entries.map(d => d.upd), backgroundColor: "rgba(16, 185, 129, 0.88)", borderRadius: 4 },
+            { label: "Cek Kembali", data: entries.map(d => d.cek), backgroundColor: "rgba(245, 158, 11, 0.88)", borderRadius: 4 },
+            { label: "Belum Realisasi (Data Kosong)", data: entries.map(d => d.kos), backgroundColor: "rgba(148, 163, 184, 0.55)", borderRadius: 4 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          onClick: (_, elements) => {
+            if (elements && elements.length > 0) {
+              const clicked = entries[elements[0].index]?.ultg;
+              if (clicked) {
+                rlState.ultg = rlState.ultg === clicked ? "ALL" : clicked;
+                rlState.induk = "ALL";
+                rlState.page = 1;
+                populateRlFilters();
+                refreshRlView();
+              }
+            }
+          },
+          scales: {
+            x: { stacked: true, grid: { color: "rgba(148, 163, 184, 0.1)" }, ticks: { color: "#e2e8f0", font: { size: 11, weight: "600" } } },
+            y: { stacked: true, beginAtZero: true, grace: "14%", grid: { color: "rgba(148, 163, 184, 0.1)" }, ticks: { color: "#cbd5e1", font: { size: 11 } } }
+          },
+          plugins: {
+            legend: { labels: { color: "#e2e8f0", font: { size: 11, weight: "600" } } },
+            datalabels: {
+              display: ctx => ctx.datasetIndex === 2,
+              anchor: "end", align: "top", font: { size: 10, weight: "700" },
+              formatter: (_, ctx) => {
+                const d = entries[ctx.dataIndex];
+                if (!d || !d.total) return "";
+                const pct = ((d.upd / d.total) * 100).toFixed(1);
+                return `${fmtNum(d.upd)}/${fmtNum(d.total)} (${pct}%)`;
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function renderRlTowerDistChart(lengkap, sebagian, belum) {
+      const statusKeys = ["LENGKAP", "SEBAGIAN", "BELUM"];
+      const ctx = document.getElementById("chart-rl-tower-dist").getContext("2d");
+      if (chartRlTowerDist) chartRlTowerDist.destroy();
+
+      chartRlTowerDist = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+          labels: ["Sudah Realisasi (Lengkap)", "Realisasi Sebagian", "Belum Realisasi (0%)"],
+          datasets: [{
+            data: [lengkap, sebagian, belum],
+            backgroundColor: ["#10b981", "#f59e0b", "#64748b"],
+            borderColor: "#0f172a",
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: "58%",
+          onClick: (_, elements) => {
+            if (elements && elements.length > 0) {
+              const targetKey = statusKeys[elements[0].index];
+              rlState.towerStatus = rlState.towerStatus === targetKey ? "ALL" : targetKey;
+              rlState.page = 1;
+              document.getElementById("rl-tower-status").value = rlState.towerStatus;
+              syncRlTowerQuickButtons();
+              refreshRlView();
+            }
+          },
+          plugins: {
+            legend: { position: "bottom", labels: { color: "#e2e8f0", font: { size: 11, weight: "600" }, padding: 10 } },
+            datalabels: {
+              color: "#ffffff", font: { size: 11, weight: "700" },
+              formatter: (val, ctx) => {
+                const sum = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                if (!sum || !val) return "";
+                const pct = ((val / sum) * 100).toFixed(1);
+                return `${fmtNum(val)} (${pct}%)`;
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function renderRlIndukChart(indukList) {
+      const limit = rlState.indukLimit === "ALL" ? indukList.length : parseInt(rlState.indukLimit, 10);
+      const sliced = indukList.slice(0, limit);
+      const isHoriz = rlState.indukOrient === "horizontal";
+
+      const wrapper = document.getElementById("rl-induk-chart-wrapper");
+      wrapper.style.height = isHoriz ? `${Math.max(420, sliced.length * 28 + 80)}px` : "460px";
+
+      const labels = sliced.map(d => d.induk.replace(/^TRS\s+/i, ""));
+      const ctx = document.getElementById("chart-rl-induk").getContext("2d");
+      if (chartRlInduk) chartRlInduk.destroy();
+
+      chartRlInduk = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels,
+          datasets: [
+            { label: "Sudah Realisasi", data: sliced.map(d => d.upd), backgroundColor: "rgba(16, 185, 129, 0.88)", borderRadius: 3 },
+            { label: "Cek Kembali", data: sliced.map(d => d.cek), backgroundColor: "rgba(245, 158, 11, 0.88)", borderRadius: 3 },
+            { label: "Belum Realisasi (Kosong)", data: sliced.map(d => d.kos), backgroundColor: "rgba(148, 163, 184, 0.55)", borderRadius: 3 }
+          ]
+        },
+        options: {
+          indexAxis: isHoriz ? "y" : "x",
+          responsive: true,
+          maintainAspectRatio: false,
+          onClick: (_, elements) => {
+            if (elements && elements.length > 0) {
+              const clicked = sliced[elements[0].index]?.induk;
+              if (clicked) {
+                rlState.induk = rlState.induk === clicked ? "ALL" : clicked;
+                rlState.page = 1;
+                document.getElementById("rl-induk").value = rlState.induk;
+                refreshRlView();
+              }
+            }
+          },
+          scales: {
+            x: { stacked: true, grid: { color: "rgba(148, 163, 184, 0.1)" }, ticks: { color: "#cbd5e1", font: { size: 10, weight: "600" }, maxRotation: isHoriz ? 0 : 55, minRotation: isHoriz ? 0 : 40 } },
+            y: { stacked: true, beginAtZero: true, grace: "12%", grid: { color: "rgba(148, 163, 184, 0.1)" }, ticks: { color: "#cbd5e1", font: { size: 11, weight: "600" } } }
+          },
+          plugins: {
+            legend: { labels: { color: "#e2e8f0", font: { size: 11, weight: "600" } } },
+            datalabels: {
+              display: ctx => sliced.length <= 22 && ctx.datasetIndex === 2,
+              anchor: "end", align: isHoriz ? "right" : "top", offset: 2, font: { size: 10, weight: "700" },
+              formatter: (_, ctx) => {
+                const d = sliced[ctx.dataIndex];
+                return d ? `${d.pctReal.toFixed(0)}%` : "";
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function renderRlTables() {
+      const q = rlState.search.trim().toLowerCase();
+
+      const towerRows = currentRlTowerList.filter(tw =>
+        !q || tw.loc.toLowerCase().includes(q) || tw.induk.toLowerCase().includes(q) || tw.ultg.toLowerCase().includes(q) || tw.jenisLabel.toLowerCase().includes(q)
+      );
+      const indukRows = currentRlIndukList.filter(d =>
+        !q || d.induk.toLowerCase().includes(q) || d.ultg.toLowerCase().includes(q)
+      );
+      const assetRows = currentRlAssetList.filter(r =>
+        !q || r.loc.toLowerCase().includes(q) || r.i.toLowerCase().includes(q) || r.u.toLowerCase().includes(q) || r.id.toLowerCase().includes(q)
+      );
+
+      document.getElementById("rl-count-tower").textContent = fmtNum(towerRows.length);
+      document.getElementById("rl-count-induk").textContent = fmtNum(indukRows.length);
+      document.getElementById("rl-count-assets").textContent = fmtNum(assetRows.length);
+
+      const isTower = rlState.activeTab === "tower";
+      const isInduk = rlState.activeTab === "induk";
+      const isAssets = rlState.activeTab === "assets";
+
+      const limit = rlState.limit === "ALL" ? Math.max(1, (isTower ? towerRows.length : assetRows.length)) : parseInt(rlState.limit, 10);
+
+      if (isTower) {
+        const maxPage = Math.max(1, Math.ceil(towerRows.length / limit));
+        if (rlState.page > maxPage) rlState.page = maxPage;
+        const startIdx = (rlState.page - 1) * limit;
+        const pageRows = towerRows.slice(startIdx, startIdx + limit);
+        document.getElementById("rl-tbody-tower").innerHTML = pageRows.map((tw, i) => `
+          <tr class="hover:bg-slate-800/40 transition">
+            <td class="py-2 px-3 text-slate-400">${startIdx + i + 1}</td>
+            <td class="py-2 px-3 text-slate-300">${escapeHtml(tw.ultg)}</td>
+            <td class="py-2 px-3 font-medium text-white">${escapeHtml(tw.induk)}</td>
+            <td class="py-2 px-3 font-semibold text-slate-200">${escapeHtml(tw.loc)}</td>
+            <td class="py-2 px-3 font-mono text-[11px] text-indigo-300">${escapeHtml(tw.jenisLabel)}</td>
+            <td class="py-2 px-3 text-right font-bold">${fmtNum(tw.total)}</td>
+            <td class="py-2 px-3 text-right font-bold text-emerald-400">${fmtNum(tw.upd)}</td>
+            <td class="py-2 px-3 text-right text-amber-300">${fmtNum(tw.cek)}</td>
+            <td class="py-2 px-3 text-right font-bold text-slate-400">${fmtNum(tw.kos)}</td>
+            <td class="py-2 px-3 text-right font-extrabold text-sky-300">${fmtDec(tw.pct, 1)}%</td>
+            <td class="py-2 px-3">${rlTowerStatusBadge(tw.status)}</td>
+            <td class="py-2 px-3 text-slate-300">${escapeHtml(tw.lastDt || "-")}</td>
+            <td class="py-2 px-3">${kondisiBadge(tw.worstKon)}</td>
+            <td class="py-2 px-3 text-right font-bold text-orange-300">${tw.maxTemp !== null ? fmtDec(tw.maxTemp, 1) : "-"}</td>
+            <td class="py-2 px-3 text-center">
+              <button onclick="focusRlTower('${escapeHtml(tw.induk).replace(/'/g, "\\'")}', '${escapeHtml(tw.loc).replace(/'/g, "\\'")}')"
+                class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-indigo-500/20 hover:bg-indigo-500 text-indigo-300 hover:text-white border border-indigo-500/30 transition">
+                Lihat Titik
+              </button>
+            </td>
+          </tr>
+        `).join("");
+        const endIdx = Math.min(startIdx + pageRows.length, towerRows.length);
+        document.getElementById("rl-pagination-info").textContent =
+          towerRows.length > 0 ? `Menampilkan ${fmtNum(startIdx + 1)} – ${fmtNum(endIdx)} dari ${fmtNum(towerRows.length)} tower/span` : "0 tower";
+        document.getElementById("rl-page-label").textContent = `Hal ${rlState.page} dari ${maxPage}`;
+        document.getElementById("rl-btn-prev").disabled = rlState.page <= 1;
+        document.getElementById("rl-btn-next").disabled = rlState.page >= maxPage;
+      }
+
+      if (isInduk) {
+        document.getElementById("rl-tbody-induk").innerHTML = indukRows.map((d, i) => `
+          <tr class="hover:bg-slate-800/40 transition">
+            <td class="py-2 px-3 text-slate-400 font-bold">${i + 1}</td>
+            <td class="py-2 px-3 font-semibold text-white">${escapeHtml(d.induk)}</td>
+            <td class="py-2 px-3 text-slate-300">${escapeHtml(d.ultg)}</td>
+            <td class="py-2 px-3 text-right font-bold">${fmtNum(d.total)}</td>
+            <td class="py-2 px-3 text-right font-bold text-emerald-400">${fmtNum(d.upd)}</td>
+            <td class="py-2 px-3 text-right text-amber-300">${fmtNum(d.cek)}</td>
+            <td class="py-2 px-3 text-right text-slate-400">${fmtNum(d.kos)}</td>
+            <td class="py-2 px-3 text-right font-extrabold text-sky-300">${fmtDec(d.pctReal, 1)}%</td>
+            <td class="py-2 px-3 text-right font-bold">${fmtNum(d.twTotal)}</td>
+            <td class="py-2 px-3 text-right text-emerald-300 font-bold">${fmtNum(d.twLengkap)}</td>
+            <td class="py-2 px-3 text-right text-amber-300">${fmtNum(d.twSebagian)}</td>
+            <td class="py-2 px-3 text-right text-rose-400 font-bold">${fmtNum(d.twBelum)}</td>
+            <td class="py-2 px-3 text-center">
+              <button onclick="focusRlInduk('${escapeHtml(d.induk).replace(/'/g, "\\'")}')"
+                class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-indigo-500/20 hover:bg-indigo-500 text-indigo-300 hover:text-white border border-indigo-500/30 transition">
+                Lihat Tower
+              </button>
+            </td>
+          </tr>
+        `).join("");
+        const tot = indukRows.reduce((a, d) => {
+          a.total += d.total; a.upd += d.upd; a.cek += d.cek; a.kos += d.kos;
+          a.twTotal += d.twTotal; a.twLengkap += d.twLengkap; a.twSebagian += d.twSebagian; a.twBelum += d.twBelum;
+          return a;
+        }, { total: 0, upd: 0, cek: 0, kos: 0, twTotal: 0, twLengkap: 0, twSebagian: 0, twBelum: 0 });
+        document.getElementById("rl-tfoot-induk").innerHTML = `
+          <tr>
+            <td class="py-2.5 px-3" colspan="3">TOTAL (${fmtNum(indukRows.length)} Penghantar)</td>
+            <td class="py-2.5 px-3 text-right">${fmtNum(tot.total)}</td>
+            <td class="py-2.5 px-3 text-right text-emerald-400">${fmtNum(tot.upd)}</td>
+            <td class="py-2.5 px-3 text-right text-amber-300">${fmtNum(tot.cek)}</td>
+            <td class="py-2.5 px-3 text-right text-slate-400">${fmtNum(tot.kos)}</td>
+            <td class="py-2.5 px-3 text-right text-sky-300">${tot.total > 0 ? fmtDec((tot.upd / tot.total) * 100, 1) : "0,0"}%</td>
+            <td class="py-2.5 px-3 text-right">${fmtNum(tot.twTotal)}</td>
+            <td class="py-2.5 px-3 text-right text-emerald-300">${fmtNum(tot.twLengkap)}</td>
+            <td class="py-2.5 px-3 text-right text-amber-300">${fmtNum(tot.twSebagian)}</td>
+            <td class="py-2.5 px-3 text-right text-rose-400">${fmtNum(tot.twBelum)}</td>
+            <td></td>
+          </tr>
+        `;
+      }
+
+      if (isAssets) {
+        const maxPage = Math.max(1, Math.ceil(assetRows.length / limit));
+        if (rlState.page > maxPage) rlState.page = maxPage;
+        const startIdx = (rlState.page - 1) * limit;
+        const pageRows = assetRows.slice(startIdx, startIdx + limit);
+        document.getElementById("rl-tbody-assets").innerHTML = pageRows.map((r, i) => `
+          <tr class="hover:bg-slate-800/40 transition">
+            <td class="py-2 px-3 text-slate-400">${startIdx + i + 1}</td>
+            <td class="py-2 px-3 font-mono text-[11px] font-bold text-indigo-300">${escapeHtml(r._jenis)}</td>
+            <td class="py-2 px-3 text-slate-300">${escapeHtml(r.u)}</td>
+            <td class="py-2 px-3 font-medium text-white">${escapeHtml(r.i)}</td>
+            <td class="py-2 px-3 text-slate-200">${escapeHtml(r.loc)}</td>
+            <td class="py-2 px-3 font-mono text-[11px] text-slate-400">${escapeHtml(r.id)}</td>
+            <td class="py-2 px-3 font-bold text-sky-300">${escapeHtml(r.ph)}</td>
+            <td class="py-2 px-3 text-slate-300">${escapeHtml(r.ln)}</td>
+            <td class="py-2 px-3 text-slate-300">${escapeHtml(r.dt || "-")}</td>
+            <td class="py-2 px-3 text-right font-bold text-orange-300">${fmtDec(r.tobj, 1)}</td>
+            <td class="py-2 px-3 text-right text-sky-300">${fmtDec(r.dt_val, 1)}</td>
+            <td class="py-2 px-3">${kondisiBadge(r.kon)}</td>
+            <td class="py-2 px-3">${status26Badge(r.st26)}</td>
+          </tr>
+        `).join("");
+        const endIdx = Math.min(startIdx + pageRows.length, assetRows.length);
+        document.getElementById("rl-pagination-info").textContent =
+          assetRows.length > 0 ? `Menampilkan ${fmtNum(startIdx + 1)} – ${fmtNum(endIdx)} dari ${fmtNum(assetRows.length)} titik` : "0 baris";
+        document.getElementById("rl-page-label").textContent = `Hal ${rlState.page} dari ${maxPage}`;
+        document.getElementById("rl-btn-prev").disabled = rlState.page <= 1;
+        document.getElementById("rl-btn-next").disabled = rlState.page >= maxPage;
+      }
+    }
+
+    function switchRlTableTab(tab) {
+      rlState.activeTab = tab;
+      rlState.page = 1;
+      const isTower = tab === "tower";
+      const isInduk = tab === "induk";
+      const isAssets = tab === "assets";
+      document.getElementById("rl-wrap-tower").classList.toggle("hidden", !isTower);
+      document.getElementById("rl-wrap-induk").classList.toggle("hidden", !isInduk);
+      document.getElementById("rl-wrap-assets").classList.toggle("hidden", !isAssets);
+      document.getElementById("rl-limit").classList.toggle("hidden", isInduk);
+      document.getElementById("rl-pagination-wrap").classList.toggle("hidden", isInduk);
+      document.getElementById("rl-tab-btn-tower").className = isTower
+        ? "px-4 py-2 rounded-xl text-xs font-bold bg-indigo-500 text-white transition"
+        : "px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
+      document.getElementById("rl-tab-btn-induk").className = isInduk
+        ? "px-4 py-2 rounded-xl text-xs font-bold bg-indigo-500 text-white transition"
+        : "px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
+      document.getElementById("rl-tab-btn-assets").className = isAssets
+        ? "px-4 py-2 rounded-xl text-xs font-bold bg-indigo-500 text-white transition"
+        : "px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
+      renderRlTables();
+    }
+
+    function syncRlTowerQuickButtons() {
+      document.querySelectorAll(".rl-twstatus-btn").forEach(b => {
+        b.className = b.dataset.rltwstatus === rlState.towerStatus
+          ? "rl-twstatus-btn px-3 py-1.5 rounded-xl font-bold bg-indigo-500 text-white transition"
+          : "rl-twstatus-btn px-3 py-1.5 rounded-xl font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
+      });
+    }
+
+    window.focusRlInduk = function (induk) {
+      rlState.induk = induk;
+      rlState.page = 1;
+      document.getElementById("rl-induk").value = induk;
+      switchRlTableTab("tower");
+      refreshRlView();
+      document.getElementById("section-rl-tables").scrollIntoView({ behavior: "smooth" });
+    };
+
+    window.focusRlTower = function (induk, loc) {
+      rlState.induk = induk;
+      rlState.search = loc;
+      rlState.page = 1;
+      document.getElementById("rl-induk").value = induk;
+      document.getElementById("rl-search").value = loc;
+      switchRlTableTab("assets");
+      refreshRlView();
+      document.getElementById("section-rl-tables").scrollIntoView({ behavior: "smooth" });
+    };
+
+    function exportRlCsv() {
+      const today = new Date().toISOString().slice(0, 10);
+      if (rlState.activeTab === "induk") {
+        downloadCsvRows(
+          `Realisasi_Thermovisi_Per_Penghantar_${today}.csv`,
+          ["Rank", "Penghantar", "ULTG", "Target Titik", "Sudah Realisasi", "Cek Kembali", "Belum Realisasi", "% Titik", "Total Tower/Span", "Tower Lengkap", "Tower Sebagian", "Tower Belum"],
+          currentRlIndukList.map((d, i) => [i + 1, d.induk, d.ultg, d.total, d.upd, d.cek, d.kos, d.pctReal.toFixed(1), d.twTotal, d.twLengkap, d.twSebagian, d.twBelum])
+        );
+      } else if (rlState.activeTab === "assets") {
+        downloadCsvRows(
+          `Realisasi_Thermovisi_Detail_Titik_${today}.csv`,
+          ["No", "Jenis", "ULTG", "Penghantar", "Tower / Span", "IDEQP", "Phasa", "Line", "Tanggal Uji", "Suhu Objek", "Delta T", "Kondisi", "Status Realisasi"],
+          currentRlAssetList.map((r, i) => [i + 1, r._jenis, r.u, r.i, r.loc, r.id, r.ph, r.ln, r.dt, r.tobj ?? "", r.dt_val ?? "", r.kon, r.st26])
+        );
+      } else {
+        downloadCsvRows(
+          `Realisasi_Thermovisi_Detail_Tower_${today}.csv`,
+          ["No", "ULTG", "Penghantar", "Tower / Span", "Jenis Aset", "Target Titik", "Sudah Realisasi", "Cek Kembali", "Belum Realisasi", "% Realisasi", "Status Tower", "Tanggal Uji Terakhir", "Kondisi", "Max Suhu (C)"],
+          currentRlTowerList.map((tw, i) => [i + 1, tw.ultg, tw.induk, tw.loc, tw.jenisLabel, tw.total, tw.upd, tw.cek, tw.kos, tw.pct.toFixed(1), tw.status, tw.lastDt, tw.worstKon, tw.maxTemp ?? ""])
         );
       }
     }
@@ -4439,6 +5415,66 @@
     document.getElementById("th-limit").addEventListener("change", e => { thState.limit = e.target.value; thState.page = 1; renderThTables(getFilteredThermoRecords(false)); });
     document.getElementById("th-btn-prev").addEventListener("click", () => { if (thState.page > 1) { thState.page--; renderThTables(getFilteredThermoRecords(false)); } });
     document.getElementById("th-btn-next").addEventListener("click", () => { thState.page++; renderThTables(getFilteredThermoRecords(false)); });
+
+    // Tab 5 (Realisasi Thermovisi) Events
+    document.getElementById("rl-jenis").addEventListener("change", e => { rlState.jenis = e.target.value; rlState.page = 1; populateRlFilters(); refreshRlView(); });
+    document.getElementById("rl-ultg").addEventListener("change", e => { rlState.ultg = e.target.value; rlState.induk = "ALL"; rlState.page = 1; populateRlFilters(); refreshRlView(); });
+    document.getElementById("rl-induk").addEventListener("change", e => { rlState.induk = e.target.value; rlState.page = 1; refreshRlView(); });
+    document.getElementById("rl-tower-status").addEventListener("change", e => { rlState.towerStatus = e.target.value; rlState.page = 1; syncRlTowerQuickButtons(); refreshRlView(); });
+    document.getElementById("rl-hide-unmapped").addEventListener("change", e => { rlState.hideUnmapped = e.target.checked; rlState.page = 1; populateRlFilters(); refreshRlView(); });
+    document.getElementById("btn-reset-rl").addEventListener("click", () => {
+      rlState.jenis = "ALL"; rlState.ultg = "ALL"; rlState.induk = "ALL"; rlState.towerStatus = "ALL";
+      rlState.hideUnmapped = false; rlState.search = ""; rlState.page = 1;
+      document.getElementById("rl-jenis").value = "ALL";
+      document.getElementById("rl-tower-status").value = "ALL";
+      document.getElementById("rl-hide-unmapped").checked = false;
+      document.getElementById("rl-search").value = "";
+      syncRlTowerQuickButtons();
+      populateRlFilters(); refreshRlView();
+    });
+    document.querySelectorAll(".rl-sort-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        rlState.indukSort = btn.dataset.rlsort;
+        document.querySelectorAll(".rl-sort-btn").forEach(b => {
+          b.className = b === btn ? "rl-sort-btn px-2.5 py-1 rounded-lg font-semibold bg-indigo-500 text-white" : "rl-sort-btn px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white";
+        });
+        refreshRlView();
+      });
+    });
+    document.querySelectorAll(".rl-limit-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        rlState.indukLimit = btn.dataset.rllimit;
+        document.querySelectorAll(".rl-limit-btn").forEach(b => {
+          b.className = b === btn ? "rl-limit-btn px-2.5 py-1 rounded-lg font-semibold bg-indigo-500 text-white" : "rl-limit-btn px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white";
+        });
+        refreshRlView();
+      });
+    });
+    document.querySelectorAll(".rl-orient-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        rlState.indukOrient = btn.dataset.rlorient;
+        document.querySelectorAll(".rl-orient-btn").forEach(b => {
+          b.className = b === btn ? "rl-orient-btn px-2.5 py-1 rounded-lg font-semibold bg-sky-500 text-slate-950" : "rl-orient-btn px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white";
+        });
+        refreshRlView();
+      });
+    });
+    document.querySelectorAll(".rl-twstatus-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        rlState.towerStatus = btn.dataset.rltwstatus; rlState.page = 1;
+        document.getElementById("rl-tower-status").value = rlState.towerStatus;
+        syncRlTowerQuickButtons();
+        refreshRlView();
+      });
+    });
+    document.getElementById("rl-tab-btn-tower").addEventListener("click", () => switchRlTableTab("tower"));
+    document.getElementById("rl-tab-btn-induk").addEventListener("click", () => switchRlTableTab("induk"));
+    document.getElementById("rl-tab-btn-assets").addEventListener("click", () => switchRlTableTab("assets"));
+    document.getElementById("rl-search").addEventListener("input", e => { rlState.search = e.target.value; rlState.page = 1; renderRlTables(); });
+    document.getElementById("rl-limit").addEventListener("change", e => { rlState.limit = e.target.value; rlState.page = 1; renderRlTables(); });
+    document.getElementById("rl-btn-prev").addEventListener("click", () => { if (rlState.page > 1) { rlState.page--; renderRlTables(); } });
+    document.getElementById("rl-btn-next").addEventListener("click", () => { rlState.page++; renderRlTables(); });
+    document.getElementById("btn-export-rl-csv").addEventListener("click", exportRlCsv);
 
     // Global Buttons
     document.getElementById("btn-export-csv").addEventListener("click", exportCurrentToCsv);
@@ -4729,7 +5765,8 @@
         "de-year", "de-month", "de-ultg", "de-induk", "de-st26", "de-kon",
         "ms-year", "ms-month", "ms-ultg", "ms-induk", "ms-kode", "ms-st26", "ms-kon", "ms-prio", "ms-skor-suhu", "ms-skor-delta",
         "an-year", "an-month", "an-ultg", "an-induk", "an-pst", "an-prio",
-        "th-year", "th-month", "th-ultg", "th-induk", "th-pst", "th-kondisi"
+        "th-year", "th-month", "th-ultg", "th-induk", "th-pst", "th-kondisi",
+        "rl-jenis", "rl-ultg", "rl-induk", "rl-tower-status"
       ];
       ids.forEach((id) => enhanceSearchableSelect(document.getElementById(id)));
       document.addEventListener("click", () => closeAllSearchableSelects());
