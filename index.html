@@ -701,7 +701,7 @@
           <div>
             <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">🏢 Filter
               ULTG</label>
-            <select id="de-ultg"
+            <select id="de-ultg" data-multi="1"
               class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-amber-500">
               <option value="ALL">Semua ULTG</option>
             </select>
@@ -709,7 +709,7 @@
           <div>
             <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">⚡ Filter
               Penghantar</label>
-            <select id="de-induk"
+            <select id="de-induk" data-multi="1"
               class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-amber-500">
               <option value="ALL">Semua Penghantar</option>
             </select>
@@ -1117,14 +1117,14 @@
           </div>
           <div>
             <label class="block font-semibold text-slate-400 mb-1">ULTG</label>
-            <select id="ms-ultg"
+            <select id="ms-ultg" data-multi="1"
               class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-slate-200">
               <option value="ALL">Semua ULTG</option>
             </select>
           </div>
           <div>
             <label class="block font-semibold text-slate-400 mb-1">Penghantar</label>
-            <select id="ms-induk"
+            <select id="ms-induk" data-multi="1"
               class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-slate-200">
               <option value="ALL">Semua Penghantar</option>
             </select>
@@ -1562,7 +1562,7 @@
           <div>
             <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">🏢 Filter
               ULTG</label>
-            <select id="an-ultg"
+            <select id="an-ultg" data-multi="1"
               class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-rose-500">
               <option value="ALL">Semua ULTG</option>
             </select>
@@ -1570,7 +1570,7 @@
           <div>
             <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">⚡ Filter
               Penghantar</label>
-            <select id="an-induk"
+            <select id="an-induk" data-multi="1"
               class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-rose-500">
               <option value="ALL">Semua Penghantar</option>
             </select>
@@ -1815,7 +1815,7 @@
           <div>
             <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">🏢 Filter
               ULTG</label>
-            <select id="th-ultg"
+            <select id="th-ultg" data-multi="1"
               class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-emerald-500">
               <option value="ALL">Semua ULTG</option>
             </select>
@@ -1823,7 +1823,7 @@
           <div>
             <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">⚡ Filter
               Penghantar</label>
-            <select id="th-induk"
+            <select id="th-induk" data-multi="1"
               class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-emerald-500">
               <option value="ALL">Semua Penghantar</option>
             </select>
@@ -2124,7 +2124,7 @@
           <div>
             <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">🏢 Filter
               ULTG</label>
-            <select id="rl-ultg"
+            <select id="rl-ultg" data-multi="1"
               class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-indigo-500">
               <option value="ALL">Semua ULTG</option>
             </select>
@@ -2132,7 +2132,7 @@
           <div>
             <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">⚡ Filter
               Penghantar</label>
-            <select id="rl-induk"
+            <select id="rl-induk" data-multi="1"
               class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-indigo-500">
               <option value="ALL">Semua Penghantar</option>
             </select>
@@ -2198,6 +2198,21 @@
           <div id="rl-kpi-tw-none" class="text-2xl lg:text-3xl font-extrabold text-amber-400 mt-1.5">0</div>
           <div id="rl-kpi-tw-none-sub" class="text-[11px] text-slate-400 mt-1">0% tower belum tersentuh uji</div>
         </div>
+      </section>
+
+      <!-- PERSENTASE ALL BERDASARKAN REALISASI PERALATAN & JUMLAH PERALATAN -->
+      <section class="glass-card rounded-2xl p-4 lg:p-5 shadow-xl">
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3.5 border-b border-slate-800">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="px-2 py-0.5 text-[10px] font-extrabold uppercase rounded bg-emerald-500 text-slate-950">ALL
+              PERALATAN</span>
+            <h3 class="text-sm lg:text-base font-bold text-white">Persentase Realisasi Berdasarkan Peralatan (Realisasi ÷
+              Jumlah Peralatan)</h3>
+          </div>
+          <span class="text-[11px] text-slate-400">Mengikuti filter ULTG &amp; Penghantar aktif (klik kartu untuk filter
+            jenis peralatan)</span>
+        </div>
+        <div id="rl-equipment-summary" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5"></div>
       </section>
 
       <!-- GRAFIK 1 (REALISASI PER ULTG) & GRAFIK 2 (STATUS TOWER) -->
@@ -2635,6 +2650,37 @@
       return Number(n || 0).toLocaleString("id-ID");
     }
 
+    function parseMultiVal(v) {
+      if (Array.isArray(v)) return v.filter(x => x && x !== "ALL");
+      const s = String(v || "").trim();
+      if (!s || s === "ALL") return [];
+      return s.split("||").map(x => x.trim()).filter(x => x && x !== "ALL");
+    }
+
+    function matchMulti(stateVal, itemVal) {
+      const arr = parseMultiVal(stateVal);
+      return arr.length === 0 || arr.includes(itemVal);
+    }
+
+    function toggleMultiVal(stateVal, clickedVal) {
+      const arr = parseMultiVal(stateVal);
+      if (arr.length === 1 && arr[0] === clickedVal) return "ALL";
+      return clickedVal;
+    }
+
+    function formatMultiLabel(stateVal, allText) {
+      const arr = parseMultiVal(stateVal);
+      if (arr.length === 0) return allText;
+      if (arr.length === 1) return arr[0];
+      return `${arr.length} dipilih (${arr.slice(0, 2).join(", ")}${arr.length > 2 ? ", ..." : ""})`;
+    }
+
+    function keepValidMulti(prevStateVal, validList) {
+      const validSet = new Set(validList);
+      const kept = parseMultiVal(prevStateVal).filter(v => validSet.has(v));
+      return kept.length ? kept.join("||") : "ALL";
+    }
+
     function fmtDec(n, digits = 1) {
       if (n === null || n === undefined || isNaN(Number(n))) return "-";
       return Number(n).toLocaleString("id-ID", {
@@ -3068,7 +3114,7 @@
       );
       const ultgs = Array.from(new Set(allDeadEndRecords.map(r => r.u).filter(Boolean))).sort();
       const induks = Array.from(
-        new Set(allDeadEndRecords.filter(r => deState.ultg === "ALL" || r.u === deState.ultg).map(r => r.i).filter(Boolean))
+        new Set(allDeadEndRecords.filter(r => matchMulti(deState.ultg, r.u)).map(r => r.i).filter(Boolean))
       ).sort();
 
       const selYear = document.getElementById("de-year");
@@ -3128,7 +3174,7 @@
         opt.value = u; opt.textContent = u;
         selU.appendChild(opt);
       });
-      selU.value = ultgs.includes(prevU) ? prevU : "ALL";
+      selU.value = keepValidMulti(prevU, ultgs);
       deState.ultg = selU.value;
 
       const selI = document.getElementById("de-induk");
@@ -3139,7 +3185,7 @@
         opt.value = i; opt.textContent = i;
         selI.appendChild(opt);
       });
-      selI.value = induks.includes(prevI) ? prevI : "ALL";
+      selI.value = keepValidMulti(prevI, induks);
       deState.induk = selI.value;
     }
 
@@ -3148,8 +3194,8 @@
         if (deState.hideUnmapped && r.i === "(Belum Dipetakan / Migrasi NS)") return false;
         if (deState.year !== "ALL" && String(r.y) !== String(deState.year)) return false;
         if (!ignoreMonth && deState.month !== "ALL" && String(r.m) !== String(deState.month)) return false;
-        if (deState.ultg !== "ALL" && r.u !== deState.ultg) return false;
-        if (deState.induk !== "ALL" && r.i !== deState.induk) return false;
+        if (!matchMulti(deState.ultg, r.u)) return false;
+        if (!matchMulti(deState.induk, r.i)) return false;
         if (deState.st26 !== "ALL" && r.st26 !== deState.st26) return false;
         if (deState.kon === "ANOMALI") {
           if (!isAnomaliKondisi(r.kon)) return false;
@@ -3706,7 +3752,7 @@
       );
       const ultgs = Array.from(new Set(allMidspanRecords.map(r => r.u).filter(Boolean))).sort();
       const induks = Array.from(
-        new Set(allMidspanRecords.filter(r => msState.ultg === "ALL" || r.u === msState.ultg).map(r => r.i).filter(Boolean))
+        new Set(allMidspanRecords.filter(r => matchMulti(msState.ultg, r.u)).map(r => r.i).filter(Boolean))
       ).sort();
 
       const selYear = document.getElementById("ms-year");
@@ -3766,7 +3812,7 @@
         opt.value = u; opt.textContent = u;
         selU.appendChild(opt);
       });
-      selU.value = ultgs.includes(prevU) ? prevU : "ALL";
+      selU.value = keepValidMulti(prevU, ultgs);
       msState.ultg = selU.value;
 
       const selI = document.getElementById("ms-induk");
@@ -3777,7 +3823,7 @@
         opt.value = i; opt.textContent = i;
         selI.appendChild(opt);
       });
-      selI.value = induks.includes(prevI) ? prevI : "ALL";
+      selI.value = keepValidMulti(prevI, induks);
       msState.induk = selI.value;
     }
 
@@ -3785,8 +3831,8 @@
       return allMidspanRecords.filter(r => {
         if (msState.year !== "ALL" && String(r.y) !== String(msState.year)) return false;
         if (!ignoreMonth && msState.month !== "ALL" && String(r.m) !== String(msState.month)) return false;
-        if (msState.ultg !== "ALL" && r.u !== msState.ultg) return false;
-        if (msState.induk !== "ALL" && r.i !== msState.induk) return false;
+        if (!matchMulti(msState.ultg, r.u)) return false;
+        if (!matchMulti(msState.induk, r.i)) return false;
         if (msState.kode !== "ALL" && r.k !== msState.kode) return false;
         if (msState.st26 !== "ALL" && r.st26 !== msState.st26) return false;
         if (msState.kon === "ANOMALI") {
@@ -4292,7 +4338,7 @@
       const years = Array.from(new Set(anomAll.map(r => r.y).filter(Boolean))).sort((a, b) => a - b);
       const monthsInYear = new Set(anomAll.filter(r => r.m && (anState.year === "ALL" || String(r.y) === String(anState.year))).map(r => r.m));
       const ultgs = Array.from(new Set(anomAll.map(r => r.u).filter(Boolean))).sort();
-      const induks = Array.from(new Set(anomAll.filter(r => anState.ultg === "ALL" || r.u === anState.ultg).map(r => r.i).filter(Boolean))).sort();
+      const induks = Array.from(new Set(anomAll.filter(r => matchMulti(anState.ultg, r.u)).map(r => r.i).filter(Boolean))).sort();
 
       const selYear = document.getElementById("an-year");
       const prevYear = anState.year;
@@ -4333,14 +4379,14 @@
       const prevUltg = anState.ultg;
       selUltg.innerHTML = `<option value="ALL">Semua ULTG (${ultgs.length})</option>`;
       ultgs.forEach(u => { const o = document.createElement("option"); o.value = u; o.textContent = u; selUltg.appendChild(o); });
-      selUltg.value = ultgs.includes(prevUltg) ? prevUltg : "ALL";
+      selUltg.value = keepValidMulti(prevUltg, ultgs);
       anState.ultg = selUltg.value;
 
       const selInduk = document.getElementById("an-induk");
       const prevInduk = anState.induk;
       selInduk.innerHTML = `<option value="ALL">Semua Penghantar (${induks.length})</option>`;
       induks.forEach(ind => { const o = document.createElement("option"); o.value = ind; o.textContent = ind; selInduk.appendChild(o); });
-      selInduk.value = induks.includes(prevInduk) ? prevInduk : "ALL";
+      selInduk.value = keepValidMulti(prevInduk, induks);
       anState.induk = selInduk.value;
     }
 
@@ -4349,8 +4395,8 @@
         if (!isAnomaliKondisi(r.k)) return false;
         if (anState.year !== "ALL" && String(r.y) !== String(anState.year)) return false;
         if (!ignoreMonth && anState.month !== "ALL" && String(r.m) !== String(anState.month)) return false;
-        if (anState.ultg !== "ALL" && r.u !== anState.ultg) return false;
-        if (anState.induk !== "ALL" && r.i !== anState.induk) return false;
+        if (!matchMulti(anState.ultg, r.u)) return false;
+        if (!matchMulti(anState.induk, r.i)) return false;
         if (anState.pst !== "ALL" && r.pst !== anState.pst) return false;
         if (anState.prio === "PERBAIKI < 3 BLN" && r.k !== "PERBAIKI < 3 BLN") return false;
         if (anState.prio === "PERIKSA SAAT HAR" && r.k !== "PERIKSA SAAT HAR") return false;
@@ -4555,7 +4601,7 @@
       const years = Array.from(new Set(allThermoRecords.map(r => r.y).filter(Boolean))).sort((a, b) => a - b);
       const monthsInYear = new Set(allThermoRecords.filter(r => r.m && (thState.year === "ALL" || String(r.y) === String(thState.year))).map(r => r.m));
       const ultgs = Array.from(new Set(allThermoRecords.map(r => r.u).filter(Boolean))).sort();
-      const induks = Array.from(new Set(allThermoRecords.filter(r => thState.ultg === "ALL" || r.u === thState.ultg).map(r => r.i).filter(Boolean))).sort();
+      const induks = Array.from(new Set(allThermoRecords.filter(r => matchMulti(thState.ultg, r.u)).map(r => r.i).filter(Boolean))).sort();
 
       const selYear = document.getElementById("th-year");
       const prevYear = thState.year;
@@ -4596,14 +4642,14 @@
       const prevUltg = thState.ultg;
       selUltg.innerHTML = `<option value="ALL">Semua ULTG (${ultgs.length})</option>`;
       ultgs.forEach(u => { const o = document.createElement("option"); o.value = u; o.textContent = u; selUltg.appendChild(o); });
-      selUltg.value = ultgs.includes(prevUltg) ? prevUltg : "ALL";
+      selUltg.value = keepValidMulti(prevUltg, ultgs);
       thState.ultg = selUltg.value;
 
       const selInduk = document.getElementById("th-induk");
       const prevInduk = thState.induk;
       selInduk.innerHTML = `<option value="ALL">Semua Penghantar (${induks.length})</option>`;
       induks.forEach(ind => { const o = document.createElement("option"); o.value = ind; o.textContent = ind; selInduk.appendChild(o); });
-      selInduk.value = induks.includes(prevInduk) ? prevInduk : "ALL";
+      selInduk.value = keepValidMulti(prevInduk, induks);
       thState.induk = selInduk.value;
     }
 
@@ -4611,8 +4657,8 @@
       return allThermoRecords.filter(r => {
         if (thState.year !== "ALL" && String(r.y) !== String(thState.year)) return false;
         if (!ignoreMonth && thState.month !== "ALL" && String(r.m) !== String(thState.month)) return false;
-        if (thState.ultg !== "ALL" && r.u !== thState.ultg) return false;
-        if (thState.induk !== "ALL" && r.i !== thState.induk) return false;
+        if (!matchMulti(thState.ultg, r.u)) return false;
+        if (!matchMulti(thState.induk, r.i)) return false;
         if (thState.pst !== "ALL" && r.pst !== thState.pst) return false;
         if (thState.kondisi === "ANOMALI") { if (!isAnomaliKondisi(r.k)) return false; }
         else if (thState.kondisi !== "ALL" && r.k !== thState.kondisi) return false;
@@ -4931,8 +4977,8 @@
     /* ======================================================================= */
     /* TAB 5: REALISASI THERMOVISI (PER ULTG, PENGHANTAR & DETAIL TOWER)       */
     /* ======================================================================= */
-    function getRlCombinedRecords() {
-      const jenis = rlState.jenis;
+    function getRlCombinedRecords(jenisOverride = null) {
+      const jenis = jenisOverride || rlState.jenis;
       const out = [];
       if (jenis === "ALL" || jenis === "C1") {
         for (const r of allDeadEndRecords) out.push({ ...r, _jenis: "C1" });
@@ -4959,11 +5005,11 @@
         opt.value = u; opt.textContent = u;
         selU.appendChild(opt);
       });
-      selU.value = ultgs.includes(prevU) ? prevU : "ALL";
+      selU.value = keepValidMulti(prevU, ultgs);
       rlState.ultg = selU.value;
 
       const induks = Array.from(
-        new Set(base.filter(r => rlState.ultg === "ALL" || r.u === rlState.ultg).map(r => r.i).filter(Boolean))
+        new Set(base.filter(r => matchMulti(rlState.ultg, r.u)).map(r => r.i).filter(Boolean))
       ).sort();
       const selI = document.getElementById("rl-induk");
       const prevI = rlState.induk;
@@ -4973,9 +5019,60 @@
         opt.value = i; opt.textContent = i;
         selI.appendChild(opt);
       });
-      selI.value = induks.includes(prevI) ? prevI : "ALL";
+      selI.value = keepValidMulti(prevI, induks);
       rlState.induk = selI.value;
     }
+
+    function renderRlEquipmentSummary() {
+      const wrap = document.getElementById("rl-equipment-summary");
+      if (!wrap) return;
+      const allBase = getRlCombinedRecords("ALL").filter(r =>
+        matchMulti(rlState.ultg, r.u) && matchMulti(rlState.induk, r.i)
+      );
+      const stats = {
+        ALL: { label: "ALL PERALATAN (C1+MJ+RS)", jenisKey: "ALL", tot: 0, upd: 0, bar: "bg-indigo-500", accent: "text-indigo-400", border: "border-l-indigo-500" },
+        C1: { label: "C1 — Dead End Clamp", jenisKey: "C1", tot: 0, upd: 0, bar: "bg-amber-500", accent: "text-amber-400", border: "border-l-amber-500" },
+        MJ: { label: "MJ — Midspan Joint", jenisKey: "MJ", tot: 0, upd: 0, bar: "bg-cyan-500", accent: "text-cyan-400", border: "border-l-cyan-500" },
+        RS: { label: "RS — Repair Sleeve", jenisKey: "RS", tot: 0, upd: 0, bar: "bg-emerald-500", accent: "text-emerald-400", border: "border-l-emerald-500" }
+      };
+      for (const r of allBase) {
+        const isUpd = r.st26 === "Data Update";
+        stats.ALL.tot++; if (isUpd) stats.ALL.upd++;
+        if (stats[r._jenis]) {
+          stats[r._jenis].tot++;
+          if (isUpd) stats[r._jenis].upd++;
+        }
+      }
+      wrap.innerHTML = ["ALL", "C1", "MJ", "RS"].map(k => {
+        const s = stats[k];
+        const pct = s.tot > 0 ? ((s.upd / s.tot) * 100) : 0;
+        const active = rlState.jenis === s.jenisKey;
+        return `
+          <button type="button" onclick="selectRlJenisCard('${s.jenisKey}')"
+            class="text-left rounded-xl p-3.5 border ${active ? "border-indigo-400 ring-2 ring-indigo-500/40" : "border-slate-700/80"} border-l-4 ${s.border} bg-slate-900/60 hover:bg-slate-800/70 transition">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">${s.label}</span>
+              <span class="text-base font-extrabold ${s.accent}">${pct.toFixed(1)}%</span>
+            </div>
+            <div class="mt-1.5 flex items-baseline justify-between text-xs">
+              <span class="font-bold text-white">${fmtNum(s.upd)} <span class="text-slate-400 font-normal">/ ${fmtNum(s.tot)} alat</span></span>
+              <span class="text-[11px] text-slate-400">Belum: ${fmtNum(s.tot - s.upd)}</span>
+            </div>
+            <div class="w-full h-2 rounded-full bg-slate-800 mt-2 overflow-hidden">
+              <div class="h-full ${s.bar} rounded-full transition-all" style="width: ${Math.min(100, pct).toFixed(1)}%"></div>
+            </div>
+          </button>
+        `;
+      }).join("");
+    }
+
+    window.selectRlJenisCard = function (jenisKey) {
+      rlState.jenis = jenisKey;
+      rlState.page = 1;
+      document.getElementById("rl-jenis").value = jenisKey;
+      populateRlFilters();
+      refreshRlView();
+    };
 
     function rlTowerStatusBadge(st) {
       if (st === "LENGKAP") return `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">✅ Sudah Realisasi</span>`;
@@ -4991,13 +5088,16 @@
 
     function refreshRlView() {
       const jenisLabels = { ALL: "Semua Aset (C1, MJ & RS)", C1: "Dead End (C1)", MJ_RS: "Midspan & Repair Sleeve", MJ: "Midspan (MJ)", RS: "Repair Sleeve (RS)" };
-      const ultgText = rlState.ultg === "ALL" ? "Semua ULTG" : rlState.ultg;
+      const ultgText = formatMultiLabel(rlState.ultg, "Semua ULTG");
+      const indukText = formatMultiLabel(rlState.induk, "");
       document.getElementById("rl-filter-badge").textContent =
-        `${jenisLabels[rlState.jenis] || "Semua"} • ${ultgText}${rlState.induk !== "ALL" ? " • " + rlState.induk : ""}`;
+        `${jenisLabels[rlState.jenis] || "Semua"} • ${ultgText}${indukText ? " • " + indukText : ""}`;
+
+      renderRlEquipmentSummary();
 
       const base = getRlCombinedRecords().filter(r => {
-        if (rlState.ultg !== "ALL" && r.u !== rlState.ultg) return false;
-        if (rlState.induk !== "ALL" && r.i !== rlState.induk) return false;
+        if (!matchMulti(rlState.ultg, r.u)) return false;
+        if (!matchMulti(rlState.induk, r.i)) return false;
         return true;
       });
 
@@ -5572,7 +5672,7 @@
     // Tab 1 (Thermo Dead End) Events
     document.getElementById("de-year").addEventListener("change", e => { deState.year = e.target.value; deState.page = 1; populateDeFilters(); refreshDeView(); });
     document.getElementById("de-month").addEventListener("change", e => { deState.month = e.target.value; deState.page = 1; populateDeFilters(); refreshDeView(); });
-    document.getElementById("de-ultg").addEventListener("change", e => { deState.ultg = e.target.value; deState.induk = "ALL"; deState.page = 1; populateDeFilters(); refreshDeView(); });
+    document.getElementById("de-ultg").addEventListener("change", e => { deState.ultg = e.target.value; deState.page = 1; populateDeFilters(); refreshDeView(); });
     document.getElementById("de-induk").addEventListener("change", e => { deState.induk = e.target.value; deState.page = 1; refreshDeView(); });
     document.getElementById("de-st26").addEventListener("change", e => { deState.st26 = e.target.value; deState.page = 1; refreshDeView(); });
     document.getElementById("de-kon").addEventListener("change", e => { deState.kon = e.target.value; deState.page = 1; refreshDeView(); });
@@ -5650,7 +5750,7 @@
     // Tab 2 (Midspan & RS) Events
     document.getElementById("ms-year").addEventListener("change", e => { msState.year = e.target.value; msState.page = 1; populateMsFilters(); refreshMsView(); });
     document.getElementById("ms-month").addEventListener("change", e => { msState.month = e.target.value; msState.page = 1; populateMsFilters(); refreshMsView(); });
-    document.getElementById("ms-ultg").addEventListener("change", e => { msState.ultg = e.target.value; msState.induk = "ALL"; msState.page = 1; populateMsFilters(); refreshMsView(); });
+    document.getElementById("ms-ultg").addEventListener("change", e => { msState.ultg = e.target.value; msState.page = 1; populateMsFilters(); refreshMsView(); });
     document.getElementById("ms-induk").addEventListener("change", e => { msState.induk = e.target.value; msState.page = 1; refreshMsView(); });
     document.getElementById("ms-kode").addEventListener("change", e => { msState.kode = e.target.value; msState.page = 1; refreshMsView(); });
     document.getElementById("ms-st26").addEventListener("change", e => { msState.st26 = e.target.value; msState.page = 1; refreshMsView(); });
@@ -5728,7 +5828,7 @@
     // Tab 3 (Anomali) Events
     document.getElementById("an-year").addEventListener("change", e => { anState.year = e.target.value; populateAnomaliFilters(); refreshAnomaliView(); });
     document.getElementById("an-month").addEventListener("change", e => { anState.month = e.target.value; populateAnomaliFilters(); refreshAnomaliView(); });
-    document.getElementById("an-ultg").addEventListener("change", e => { anState.ultg = e.target.value; anState.induk = "ALL"; populateAnomaliFilters(); refreshAnomaliView(); });
+    document.getElementById("an-ultg").addEventListener("change", e => { anState.ultg = e.target.value; populateAnomaliFilters(); refreshAnomaliView(); });
     document.getElementById("an-induk").addEventListener("change", e => { anState.induk = e.target.value; refreshAnomaliView(); });
     document.getElementById("an-pst").addEventListener("change", e => { anState.pst = e.target.value; refreshAnomaliView(); });
     document.getElementById("an-prio").addEventListener("change", e => { anState.prio = e.target.value; refreshAnomaliView(); });
@@ -5744,7 +5844,7 @@
     // Tab 4 (Thermovisi Gabungan) Events
     document.getElementById("th-year").addEventListener("change", e => { thState.year = e.target.value; thState.page = 1; populateThermoFilters(); refreshThermoView(); });
     document.getElementById("th-month").addEventListener("change", e => { thState.month = e.target.value; thState.page = 1; populateThermoFilters(); refreshThermoView(); });
-    document.getElementById("th-ultg").addEventListener("change", e => { thState.ultg = e.target.value; thState.induk = "ALL"; thState.page = 1; populateThermoFilters(); refreshThermoView(); });
+    document.getElementById("th-ultg").addEventListener("change", e => { thState.ultg = e.target.value; thState.page = 1; populateThermoFilters(); refreshThermoView(); });
     document.getElementById("th-induk").addEventListener("change", e => { thState.induk = e.target.value; thState.page = 1; refreshThermoView(); });
     document.getElementById("th-pst").addEventListener("change", e => { thState.pst = e.target.value; thState.page = 1; refreshThermoView(); });
     document.getElementById("th-kondisi").addEventListener("change", e => { thState.kondisi = e.target.value; thState.page = 1; refreshThermoView(); });
@@ -5789,7 +5889,7 @@
 
     // Tab 5 (Realisasi Thermovisi) Events
     document.getElementById("rl-jenis").addEventListener("change", e => { rlState.jenis = e.target.value; rlState.page = 1; populateRlFilters(); refreshRlView(); });
-    document.getElementById("rl-ultg").addEventListener("change", e => { rlState.ultg = e.target.value; rlState.induk = "ALL"; rlState.page = 1; populateRlFilters(); refreshRlView(); });
+    document.getElementById("rl-ultg").addEventListener("change", e => { rlState.ultg = e.target.value; rlState.page = 1; populateRlFilters(); refreshRlView(); });
     document.getElementById("rl-induk").addEventListener("change", e => { rlState.induk = e.target.value; rlState.page = 1; refreshRlView(); });
     document.getElementById("rl-tower-status").addEventListener("change", e => { rlState.towerStatus = e.target.value; rlState.page = 1; syncRlTowerQuickButtons(); refreshRlView(); });
     document.getElementById("rl-hide-unmapped").addEventListener("change", e => { rlState.hideUnmapped = e.target.checked; rlState.page = 1; populateRlFilters(); refreshRlView(); });
@@ -6038,8 +6138,16 @@
       selectEl.parentNode.insertBefore(wrap, selectEl.nextSibling);
 
       const section = selectEl.closest("section.glass-card");
+      const isMulti = selectEl.dataset.multi === "1";
+      selectEl._multiValues = [];
 
       function syncTriggerLabel() {
+        if (isMulti) {
+          const allOpt = Array.from(selectEl.options).find(o => o.value === "ALL");
+          const allTxt = allOpt ? allOpt.textContent : "Semua";
+          labelSpan.textContent = formatMultiLabel(selectEl._multiValues, allTxt);
+          return;
+        }
         const opt = selectEl.options[selectEl.selectedIndex];
         labelSpan.textContent = opt ? opt.textContent : "Pilih...";
       }
@@ -6052,20 +6160,51 @@
           const txt = opt.textContent || "";
           if (q && !txt.toLowerCase().includes(q)) return;
           matchCount++;
+          const isChecked = isMulti
+            ? (opt.value === "ALL" ? selectEl._multiValues.length === 0 : selectEl._multiValues.includes(opt.value))
+            : opt.value === selectEl.value;
           const item = document.createElement("div");
-          item.className = "ss-opt" + (opt.value === selectEl.value ? " ss-selected" : "");
+          item.className = "ss-opt" + (isChecked ? " ss-selected" : "");
           item.dataset.value = opt.value;
+
+          const leftWrap = document.createElement("span");
+          leftWrap.className = "flex items-center gap-2 truncate";
+          if (isMulti && opt.value !== "ALL") {
+            const cb = document.createElement("input");
+            cb.type = "checkbox";
+            cb.checked = isChecked;
+            cb.className = "rounded border-slate-500 accent-indigo-500 pointer-events-none shrink-0";
+            leftWrap.appendChild(cb);
+          }
           const txtSpan = document.createElement("span");
           txtSpan.className = "truncate";
           txtSpan.textContent = txt;
-          item.appendChild(txtSpan);
-          if (opt.value === selectEl.value) {
+          leftWrap.appendChild(txtSpan);
+          item.appendChild(leftWrap);
+
+          if (isChecked && (!isMulti || opt.value === "ALL")) {
             const chk = document.createElement("span");
             chk.textContent = "✓";
             item.appendChild(chk);
           }
           item.addEventListener("click", (e) => {
             e.stopPropagation();
+            if (isMulti) {
+              if (opt.value === "ALL") {
+                selectEl._multiValues = [];
+                selectEl.dispatchEvent(new Event("change", { bubbles: true }));
+                syncTriggerLabel();
+                closeAllSearchableSelects();
+              } else {
+                const idx = selectEl._multiValues.indexOf(opt.value);
+                if (idx >= 0) selectEl._multiValues.splice(idx, 1);
+                else selectEl._multiValues.push(opt.value);
+                selectEl.dispatchEvent(new Event("change", { bubbles: true }));
+                syncTriggerLabel();
+                renderOptions(searchInput.value);
+              }
+              return;
+            }
             if (selectEl.value !== opt.value) {
               selectEl.value = opt.value;
               selectEl.dispatchEvent(new Event("change", { bubbles: true }));
@@ -6115,8 +6254,19 @@
       const valDesc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, "value");
       if (valDesc && valDesc.configurable) {
         Object.defineProperty(selectEl, "value", {
-          get() { return valDesc.get.call(this); },
-          set(v) { valDesc.set.call(this, v); syncTriggerLabel(); }
+          get() {
+            if (isMulti) return selectEl._multiValues.length ? selectEl._multiValues.join("||") : "ALL";
+            return valDesc.get.call(this);
+          },
+          set(v) {
+            if (isMulti) {
+              selectEl._multiValues = parseMultiVal(v);
+              valDesc.set.call(this, selectEl._multiValues.length === 1 ? selectEl._multiValues[0] : "ALL");
+              syncTriggerLabel();
+              return;
+            }
+            valDesc.set.call(this, v); syncTriggerLabel();
+          }
         });
       }
 
