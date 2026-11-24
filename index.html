@@ -11,6 +11,7 @@
     src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="data/rekap_thermo_data.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -2359,10 +2360,50 @@
               class="rl-twstatus-btn px-3 py-1.5 rounded-xl font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">🚨
               Belum Lengkap</button>
           </div>
-          <button id="btn-export-rl-csv"
-            class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1.5 transition">
-            <span>📥</span><span>Export Detail Realisasi (CSV)</span>
-          </button>
+          <div class="flex flex-wrap items-center gap-2">
+            <button id="btn-rl-wa"
+              class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-green-600 hover:bg-green-500 text-white flex items-center gap-1.5 transition">
+              <span>💬</span><span>Format WA</span>
+            </button>
+            <button id="btn-export-rl-xlsx"
+              class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-1.5 transition">
+              <span>📊</span><span>Download Excel (.xlsx)</span>
+            </button>
+            <button id="btn-export-rl-csv"
+              class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1.5 transition">
+              <span>📥</span><span>Export CSV</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- MODAL PREVIEW FORMAT WHATSAPP -->
+        <div id="rl-wa-modal"
+          class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm">
+          <div class="glass-card rounded-2xl w-full max-w-2xl p-5 border border-emerald-500/40 shadow-2xl space-y-3">
+            <div class="flex items-center justify-between gap-2 pb-2.5 border-b border-slate-800">
+              <div class="flex items-center gap-2">
+                <span class="text-lg">💬</span>
+                <h3 class="text-sm font-extrabold text-white">Format Laporan WhatsApp — Realisasi Thermovisi</h3>
+              </div>
+              <button type="button" id="btn-close-rl-wa"
+                class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300">✕
+                Tutup</button>
+            </div>
+            <p class="text-[11px] text-slate-400">Otomatis mengikuti filter aktif (Jenis Aset, ULTG, Penghantar, Status
+              Tower: Sudah / Sebagian / Belum, &amp; Pencarian).</p>
+            <textarea id="rl-wa-text" rows="15"
+              class="w-full rounded-xl bg-slate-900 border border-slate-700 p-3 text-xs font-mono text-slate-100 focus:outline-none focus:border-emerald-500"></textarea>
+            <div class="flex flex-wrap items-center justify-end gap-2 pt-1">
+              <button type="button" id="btn-copy-rl-wa"
+                class="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition">
+                📋 Salin Teks WA
+              </button>
+              <a id="btn-open-rl-wa" href="#" target="_blank" rel="noopener"
+                class="px-4 py-2 rounded-xl text-xs font-bold bg-green-600 hover:bg-green-500 text-white transition">
+                📲 Kirim via WhatsApp
+              </a>
+            </div>
+          </div>
         </div>
 
         <!-- SUBTAB 1 RL: DETAIL TOWER / SPAN -->
@@ -5472,9 +5513,8 @@
       });
     }
 
-    function renderRlTables() {
+    function getFilteredRlTableSets() {
       const q = rlState.search.trim().toLowerCase();
-
       const towerRows = currentRlTowerList.filter(tw =>
         !q || tw.loc.toLowerCase().includes(q) || tw.induk.toLowerCase().includes(q) || tw.ultg.toLowerCase().includes(q) || tw.jenisLabel.toLowerCase().includes(q)
       );
@@ -5484,6 +5524,11 @@
       const assetRows = currentRlAssetList.filter(r =>
         !q || r.loc.toLowerCase().includes(q) || r.i.toLowerCase().includes(q) || r.u.toLowerCase().includes(q) || r.id.toLowerCase().includes(q)
       );
+      return { towerRows, indukRows, assetRows };
+    }
+
+    function renderRlTables() {
+      const { towerRows, indukRows, assetRows } = getFilteredRlTableSets();
 
       document.getElementById("rl-count-tower").textContent = fmtNum(towerRows.length);
       document.getElementById("rl-count-induk").textContent = fmtNum(indukRows.length);
@@ -5661,25 +5706,132 @@
 
     function exportRlCsv() {
       const today = new Date().toISOString().slice(0, 10);
+      const { towerRows, indukRows, assetRows } = getFilteredRlTableSets();
       if (rlState.activeTab === "induk") {
         downloadCsvRows(
           `Realisasi_Thermovisi_Per_Penghantar_${today}.csv`,
           ["Rank", "Penghantar", "ULTG", "Target Titik", "Sudah Realisasi", "Cek Kembali", "Belum Realisasi", "% Titik", "Total Tower/Span", "Tower Lengkap", "Tower Sebagian", "Tower Belum"],
-          currentRlIndukList.map((d, i) => [i + 1, d.induk, d.ultg, d.total, d.upd, d.cek, d.kos, d.pctReal.toFixed(1), d.twTotal, d.twLengkap, d.twSebagian, d.twBelum])
+          indukRows.map((d, i) => [i + 1, d.induk, d.ultg, d.total, d.upd, d.cek, d.kos, d.pctReal.toFixed(1), d.twTotal, d.twLengkap, d.twSebagian, d.twBelum])
         );
       } else if (rlState.activeTab === "assets") {
         downloadCsvRows(
           `Realisasi_Thermovisi_Detail_Titik_${today}.csv`,
           ["No", "Jenis", "ULTG", "Penghantar", "Tower / Span", "IDEQP", "Phasa", "Line", "Tanggal Uji", "Suhu Objek", "Delta T", "Kondisi", "Status Realisasi"],
-          currentRlAssetList.map((r, i) => [i + 1, r._jenis, r.u, r.i, r.loc, r.id, r.ph, r.ln, r.dt, r.tobj ?? "", r.dt_val ?? "", r.kon, r.st26])
+          assetRows.map((r, i) => [i + 1, r._jenis, r.u, r.i, r.loc, r.id, r.ph, r.ln, r.dt, r.tobj ?? "", r.dt_val ?? "", r.kon, r.st26])
         );
       } else {
         downloadCsvRows(
           `Realisasi_Thermovisi_Detail_Tower_${today}.csv`,
           ["No", "ULTG", "Penghantar", "Tower / Span", "Jenis Aset", "Target Titik", "Sudah Realisasi", "Cek Kembali", "Belum Realisasi", "% Realisasi", "Status Tower", "Tanggal Uji Terakhir", "Kondisi", "Max Suhu (C)"],
-          currentRlTowerList.map((tw, i) => [i + 1, tw.ultg, tw.induk, tw.loc, tw.jenisLabel, tw.total, tw.upd, tw.cek, tw.kos, tw.pct.toFixed(1), tw.status, tw.lastDt, tw.worstKon, tw.maxTemp ?? ""])
+          towerRows.map((tw, i) => [i + 1, tw.ultg, tw.induk, tw.loc, tw.jenisLabel, tw.total, tw.upd, tw.cek, tw.kos, tw.pct.toFixed(1), tw.status, tw.lastDt, tw.worstKon, tw.maxTemp ?? ""])
         );
       }
+    }
+
+    function exportRlXlsx() {
+      const today = new Date().toISOString().slice(0, 10);
+      const { towerRows, indukRows, assetRows } = getFilteredRlTableSets();
+      const towerAoA = [
+        ["No", "ULTG", "Penghantar", "Tower / Span", "Jenis Aset", "Target Titik", "Sudah Realisasi", "Cek Kembali", "Belum Realisasi", "% Realisasi", "Status Tower", "Tanggal Uji Terakhir", "Kondisi", "Max Suhu (C)"],
+        ...towerRows.map((tw, i) => [i + 1, tw.ultg, tw.induk, tw.loc, tw.jenisLabel, tw.total, tw.upd, tw.cek, tw.kos, Number(tw.pct.toFixed(1)), tw.status, tw.lastDt || "-", tw.worstKon, tw.maxTemp ?? ""])
+      ];
+      const indukAoA = [
+        ["Rank", "Penghantar", "ULTG", "Target Titik", "Sudah Realisasi", "Cek Kembali", "Belum Realisasi", "% Titik", "Total Tower/Span", "Tower Lengkap", "Tower Sebagian", "Tower Belum"],
+        ...indukRows.map((d, i) => [i + 1, d.induk, d.ultg, d.total, d.upd, d.cek, d.kos, Number(d.pctReal.toFixed(1)), d.twTotal, d.twLengkap, d.twSebagian, d.twBelum])
+      ];
+      const assetAoA = [
+        ["No", "Jenis", "ULTG", "Penghantar", "Tower / Span", "IDEQP", "Phasa", "Line", "Tanggal Uji", "Suhu Objek", "Delta T", "Kondisi", "Status Realisasi"],
+        ...assetRows.map((r, i) => [i + 1, r._jenis, r.u, r.i, r.loc, r.id, r.ph, r.ln, r.dt || "-", r.tobj ?? "", r.dt_val ?? "", r.kon, r.st26])
+      ];
+
+      if (typeof XLSX !== "undefined") {
+        const wb = XLSX.utils.book_new();
+        const addSheet = (name, aoa) => {
+          const ws = XLSX.utils.aoa_to_sheet(aoa);
+          ws["!cols"] = aoa[0].map((h, colIdx) => ({
+            wch: Math.min(42, Math.max(String(h).length + 2, ...aoa.slice(1, 60).map(r => String(r[colIdx] ?? "").length + 2)))
+          }));
+          XLSX.utils.book_append_sheet(wb, ws, name);
+        };
+        addSheet("Detail Tower", towerAoA);
+        addSheet("Rekap Penghantar", indukAoA);
+        addSheet("Rincian Titik IDEQP", assetAoA);
+        XLSX.writeFile(wb, `Realisasi_Thermovisi_${today}.xlsx`);
+        return;
+      }
+      // Fallback jika library CDN tidak termuat (offline)
+      const activeAoA = rlState.activeTab === "induk" ? indukAoA : (rlState.activeTab === "assets" ? assetAoA : towerAoA);
+      const tblHtml = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8"/></head><body><table border="1">${activeAoA.map(r => `<tr>${r.map(c => `<td>${escapeHtml(c)}</td>`).join("")}</tr>`).join("")}</table></body></html>`;
+      const blob = new Blob(["\uFEFF" + tblHtml], { type: "application/vnd.ms-excel;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = `Realisasi_Thermovisi_${today}.xls`;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function buildRlWaText() {
+      const { towerRows, indukRows, assetRows } = getFilteredRlTableSets();
+      const jenisMap = { ALL: "Semua Aset (C1+MJ+RS)", C1: "Dead End (C1)", MJ_RS: "Midspan & Repair Sleeve (MJ+RS)", MJ: "Midspan Joint (MJ)", RS: "Repair Sleeve (RS)" };
+      const statusMap = { ALL: "Semua Status Tower", LENGKAP: "Sudah Realisasi (Lengkap)", SEBAGIAN: "Realisasi Sebagian", BELUM: "Belum Realisasi", BELUM_LENGKAP: "Belum Lengkap (Sebagian + Belum)" };
+      const totPts = assetRows.length;
+      const updPts = assetRows.filter(r => r.st26 === "Data Update").length;
+      const cekPts = assetRows.filter(r => r.st26 === "Cek Kembali").length;
+      const kosPts = totPts - updPts - cekPts;
+      const pctPts = totPts > 0 ? ((updPts / totPts) * 100).toFixed(1) : "0.0";
+      const twLengkap = towerRows.filter(t => t.status === "LENGKAP").length;
+      const twSebagian = towerRows.filter(t => t.status === "SEBAGIAN").length;
+      const twBelum = towerRows.filter(t => t.status === "BELUM").length;
+
+      const lines = [
+        `*LAPORAN REALISASI THERMOVISI TRANSMISI*`,
+        `• Jenis Aset: ${jenisMap[rlState.jenis] || rlState.jenis}`,
+        `• ULTG: ${formatMultiLabel(rlState.ultg, "Semua ULTG")}`,
+        `• Penghantar: ${formatMultiLabel(rlState.induk, "Semua Penghantar")}`,
+        `• Filter Tower: ${statusMap[rlState.towerStatus] || rlState.towerStatus}`,
+        ``,
+        `*RINGKASAN REALISASI:*`,
+        `• Titik Terealisasi: *${fmtNum(updPts)} / ${fmtNum(totPts)} (${pctPts}%)*`,
+        `• Belum Realisasi: *${fmtNum(cekPts + kosPts)}* (Cek Kembali: ${fmtNum(cekPts)}, Kosong: ${fmtNum(kosPts)})`,
+        `• Tower/Span (${fmtNum(towerRows.length)}): Lengkap *${fmtNum(twLengkap)}* | Sebagian *${fmtNum(twSebagian)}* | Belum *${fmtNum(twBelum)}*`
+      ];
+
+      if (indukRows.length > 0 && indukRows.length <= 25) {
+        lines.push(``, `*REKAP PER PENGHANTAR:*`);
+        indukRows.forEach((d, idx) => {
+          lines.push(`${idx + 1}. ${d.induk}: *${fmtNum(d.upd)}/${fmtNum(d.total)} (${d.pctReal.toFixed(1)}%)* [L:${d.twLengkap} S:${d.twSebagian} B:${d.twBelum}]`);
+        });
+      }
+
+      if (towerRows.length > 0) {
+        const maxShow = 60;
+        lines.push(``, `*DETAIL TOWER / SPAN (${fmtNum(towerRows.length)}):*`);
+        towerRows.slice(0, maxShow).forEach((tw, idx) => {
+          const icon = tw.status === "LENGKAP" ? "✅" : tw.status === "SEBAGIAN" ? "🟡" : "⚪";
+          lines.push(`${idx + 1}. ${icon} *${tw.loc}* (${tw.jenisLabel}) — ${tw.upd}/${tw.total} (${tw.pct.toFixed(0)}%) | ${tw.status}`);
+          if (tw.status === "SEBAGIAN") {
+            const belumItems = tw.records.filter(r => r.st26 !== "Data Update").slice(0, 6);
+            if (belumItems.length > 0) {
+              const det = belumItems.map(r => `${r._jenis} ${r.id} (Ph.${r.ph}/${r.ln}: ${r.st26})`).join("; ");
+              lines.push(`   ↳ Belum: ${det}${tw.records.filter(r => r.st26 !== "Data Update").length > 6 ? "; ..." : ""}`);
+            }
+          }
+        });
+        if (towerRows.length > maxShow) {
+          lines.push(`... dan *${fmtNum(towerRows.length - maxShow)}* tower/span lainnya (unduh Excel untuk daftar lengkap).`);
+        }
+      }
+      return lines.join("\n");
+    }
+
+    function openRlWaModal() {
+      const text = buildRlWaText();
+      const ta = document.getElementById("rl-wa-text");
+      const modal = document.getElementById("rl-wa-modal");
+      const waLink = document.getElementById("btn-open-rl-wa");
+      ta.value = text;
+      waLink.href = `https://wa.me/?text=${encodeURIComponent(text)}`;
+      modal.classList.remove("hidden");
     }
 
     function exportDeCsv() {
@@ -5978,6 +6130,23 @@
     document.getElementById("rl-btn-prev").addEventListener("click", () => { if (rlState.page > 1) { rlState.page--; renderRlTables(); } });
     document.getElementById("rl-btn-next").addEventListener("click", () => { rlState.page++; renderRlTables(); });
     document.getElementById("btn-export-rl-csv").addEventListener("click", exportRlCsv);
+    document.getElementById("btn-export-rl-xlsx").addEventListener("click", exportRlXlsx);
+    document.getElementById("btn-rl-wa").addEventListener("click", openRlWaModal);
+    document.getElementById("btn-close-rl-wa").addEventListener("click", () => {
+      document.getElementById("rl-wa-modal").classList.add("hidden");
+    });
+    document.getElementById("btn-copy-rl-wa").addEventListener("click", async () => {
+      const ta = document.getElementById("rl-wa-text");
+      const btn = document.getElementById("btn-copy-rl-wa");
+      try {
+        await navigator.clipboard.writeText(ta.value);
+      } catch (_) {
+        ta.select();
+        document.execCommand("copy");
+      }
+      btn.textContent = "✅ Tersalin!";
+      setTimeout(() => { btn.textContent = "📋 Salin Teks WA"; }, 1800);
+    });
 
     // Global Buttons
     document.getElementById("btn-export-csv").addEventListener("click", exportCurrentToCsv);
