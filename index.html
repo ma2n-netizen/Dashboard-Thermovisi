@@ -2087,7 +2087,7 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
           <div>
             <label class="block text-[11px] font-bold uppercase tracking-wider text-indigo-400 mb-1.5">🔩 Jenis Aset
               Thermovisi</label>
@@ -2126,6 +2126,18 @@
               <option value="SEBAGIAN">🟡 Realisasi Sebagian</option>
               <option value="BELUM">⚪ Belum Realisasi (0%)</option>
               <option value="BELUM_LENGKAP">🚨 Belum Lengkap (Sebagian + Belum)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-rose-400 mb-1.5">🔥 Segmen Kritikal
+              (P0–P3)</label>
+            <select id="rl-kritikal"
+              class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-rose-500">
+              <option value="ALL">Semua Kritikal (P0–P3)</option>
+              <option value="P0">🔴 P0 — Kritis Utama</option>
+              <option value="P1">🟠 P1 — Segmen Kritikal 1</option>
+              <option value="P2">🟡 P2 — Segmen Kritikal 2</option>
+              <option value="P3">⚪ P3 — Lainnya / Non-Kritis</option>
             </select>
           </div>
         </div>
@@ -2224,6 +2236,56 @@
           </div>
           <div class="relative w-full" style="height: 320px;">
             <canvas id="chart-rl-tower-dist"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- GRAFIK & TABEL SEGMEN KRITIKAL (P0, P1, P2, P3) -->
+      <section class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <div class="glass-card rounded-2xl p-5 shadow-xl">
+          <div class="pb-3 mb-3 border-b border-slate-800">
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 text-[10px] font-extrabold uppercase rounded bg-rose-500 text-white">SEGMEN
+                KRITIKAL</span>
+              <h3 class="text-sm lg:text-base font-bold text-white">Grafik Realisasi Per Kategori Kritikal (P0, P1, P2,
+                P3)</h3>
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">Perbandingan Sudah Realisasi vs Belum Realisasi berdasarkan
+              klasifikasi segmen kritikal. <strong class="text-rose-300">Klik batang P0–P3</strong> untuk filter.</p>
+          </div>
+          <div class="relative w-full" style="height: 280px;">
+            <canvas id="chart-rl-kritikal"></canvas>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-5 shadow-xl flex flex-col">
+          <div class="pb-3 mb-3 border-b border-slate-800">
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 text-[10px] font-extrabold uppercase rounded bg-amber-500 text-slate-950">TABEL
+                P0–P3</span>
+              <h3 class="text-sm lg:text-base font-bold text-white">Rekap Realisasi Segmen Kritikal (P0, P1, P2, P3)</h3>
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">Ringkasan jumlah segmen, target titik, realisasi (%), dan status
+              tower tiap kategori kritikal.</p>
+          </div>
+          <div class="overflow-x-auto flex-1">
+            <table class="w-full text-left border-collapse text-xs whitespace-nowrap">
+              <thead class="bg-slate-900 text-slate-300 uppercase text-[11px] border-b border-slate-700">
+                <tr>
+                  <th class="py-2.5 px-2.5">Kritikal</th>
+                  <th class="py-2.5 px-2.5 text-right">Segmen</th>
+                  <th class="py-2.5 px-2.5 text-right">Target</th>
+                  <th class="py-2.5 px-2.5 text-right text-emerald-400">Sudah</th>
+                  <th class="py-2.5 px-2.5 text-right text-slate-400">Belum</th>
+                  <th class="py-2.5 px-2.5 text-right text-sky-300">% Real</th>
+                  <th class="py-2.5 px-2.5 text-center">Tower (L/S/B)</th>
+                  <th class="py-2.5 px-2.5 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="rl-tbody-kritikal" class="divide-y divide-slate-800/80 text-slate-200"></tbody>
+              <tfoot id="rl-tfoot-kritikal"
+                class="bg-slate-900 font-bold text-white border-t-2 border-rose-500/40"></tfoot>
+            </table>
           </div>
         </div>
       </section>
@@ -2341,9 +2403,19 @@
           </div>
         </div>
 
-        <div id="rl-quick-ultg-bar" class="flex flex-wrap items-center gap-1.5 text-xs mb-3 pb-3 border-b border-slate-800/80">
-          <span class="text-slate-400 font-semibold mr-1">Filter Cepat ULTG:</span>
-          <div id="rl-quick-ultg-pills" class="flex flex-wrap items-center gap-1.5"></div>
+        <div id="rl-quick-ultg-bar" class="flex flex-wrap items-center justify-between gap-2 text-xs mb-3 pb-3 border-b border-slate-800/80">
+          <div class="flex flex-wrap items-center gap-1.5">
+            <span class="text-slate-400 font-semibold mr-1">Filter Cepat ULTG:</span>
+            <div id="rl-quick-ultg-pills" class="flex flex-wrap items-center gap-1.5"></div>
+          </div>
+          <div class="flex flex-wrap items-center gap-1.5">
+            <span class="text-slate-400 font-semibold mr-1">Kritikal:</span>
+            <button data-rlkrit="ALL" class="rl-krit-btn px-2.5 py-1 rounded-xl font-bold bg-rose-500 text-white transition">Semua</button>
+            <button data-rlkrit="P0" class="rl-krit-btn px-2.5 py-1 rounded-xl font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">P0</button>
+            <button data-rlkrit="P1" class="rl-krit-btn px-2.5 py-1 rounded-xl font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">P1</button>
+            <button data-rlkrit="P2" class="rl-krit-btn px-2.5 py-1 rounded-xl font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">P2</button>
+            <button data-rlkrit="P3" class="rl-krit-btn px-2.5 py-1 rounded-xl font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">P3</button>
+          </div>
         </div>
 
         <div id="rl-quick-tower-bar" class="flex flex-wrap items-center justify-between gap-3 mb-4">
@@ -2418,6 +2490,7 @@
               class="sticky top-0 bg-slate-900 text-slate-300 uppercase text-[11px] border-b border-slate-700 z-10">
               <tr>
                 <th class="py-3 px-3">No</th>
+                <th class="py-3 px-3">Kritikal</th>
                 <th class="py-3 px-3">ULTG</th>
                 <th class="py-3 px-3">Penghantar</th>
                 <th class="py-3 px-3">Tower / Span (Functloc)</th>
@@ -2445,6 +2518,7 @@
               class="sticky top-0 bg-slate-900 text-slate-300 uppercase text-[11px] border-b border-slate-700 z-10">
               <tr>
                 <th class="py-3 px-3">Rank</th>
+                <th class="py-3 px-3">Kritikal</th>
                 <th class="py-3 px-3">Penghantar</th>
                 <th class="py-3 px-3">ULTG</th>
                 <th class="py-3 px-3 text-right">Target Titik</th>
@@ -2652,6 +2726,7 @@
       ultg: "ALL",
       induk: "ALL",
       towerStatus: "ALL",
+      kritikal: "ALL",
       hideUnmapped: false,
       indukSort: "pct_asc",
       indukLimit: "ALL",
@@ -2663,6 +2738,7 @@
     };
     let chartRlUltg = null;
     let chartRlTowerDist = null;
+    let chartRlKritikal = null;
     let chartRlInduk = null;
     let rlLeafletMap = null;
     let rlMapLayerGroup = null;
@@ -5059,6 +5135,59 @@
     /* ======================================================================= */
     /* TAB 5: REALISASI THERMOVISI (PER ULTG, PENGHANTAR & DETAIL TOWER)       */
     /* ======================================================================= */
+    const SEGMEN_KRITIKAL_RAW = {
+      "275KV SMSL5-SGLIN": "P1",
+      "275KV BTUNG-SGLIN": "P1",
+      "150KV TJAPI-MNTOK": "P1",
+      "150KV KYUNG-GMWNG": "P1",
+      "150KV BRANG-AGP": "P2",
+      "150KV TLKLP-KNTEN": "P1",
+      "150KV KNTEN-BRANG": "P1",
+      "150KV TLKLP-BTUNG": "P1",
+      "150KV BTUNG-TLDKU": "P2",
+      "150KV BTUNG-SKAYU": "P2",
+      "150KV KNTEN-TJAPI": "P1",
+      "150KV KRSAN-GNDUS": "P1",
+      "150KV KRSAN-NRING": "P2",
+      "150KV GNDUS-TLKLP": "P2",
+      "150KV NRING-MRINA": "P2",
+      "150KV MRINA-BRANG": "P2",
+      "150KV MRINA-KYUNG": "P1",
+      "150KV INCOMER GI NRING": "P2",
+      "150KV INCOMER GI GNDUS": "P2",
+      "150KV INCOMER GI JAKABARING": "P2",
+      "70KV KRSAN-BGRAN": "P2",
+      "70KV KRSAN-BKSGT": "P1",
+      "70KV SJARO-SKDKN": "P1",
+      "70KV BKSGT-TRATU": "P2",
+      "70KV BGRAN-SKDKN": "P2",
+      "70KV SJARO-BRANG": "P1",
+      "70KV TRATU-SDPTH": "P2",
+      "70KV SDPTH-BMBRU": "P2",
+      "70KV SDPTH-BRANG": "P1",
+      "150KV AIR ANYIR-PANGKAL PINANG": "P1",
+      "150KV AIR ANYIR-SUNGAI LIAT": "P1",
+      "150KV KELAPA-MUNTOK": "P1",
+      "150KV KOBA-TOBOALI": "P2",
+      "150KV PANGKALPINANG-KELAPA": "P1",
+      "150KV PANGKALPINANG-KOBA": "P1",
+      "150KV MUNTOK-LANDING POINT": "P1",
+      "70KV DUKONG-MANGGAR": "P2",
+      "70KV SUGE-DUKONG": "P1"
+    };
+
+    function getSegmenKritikal(induk) {
+      const key = normPenghantarKeyJs(induk);
+      return SEGMEN_KRITIKAL_RAW[key] || "P3";
+    }
+
+    function kritikalBadge(k) {
+      if (k === "P0") return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-rose-600 text-white">P0</span>`;
+      if (k === "P1") return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-orange-500/25 text-orange-300 border border-orange-500/40">P1</span>`;
+      if (k === "P2") return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">P2</span>`;
+      return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700/60 text-slate-300 border border-slate-600">P3</span>`;
+    }
+
     function getRlCombinedRecords(jenisOverride = null) {
       const jenis = jenisOverride || rlState.jenis;
       const out = [];
@@ -5214,8 +5343,9 @@
       const jenisLabels = { ALL: "Semua Aset (C1, MJ & RS)", C1: "Dead End (C1)", MJ_RS: "Midspan & Repair Sleeve", MJ: "Midspan (MJ)", RS: "Repair Sleeve (RS)" };
       const ultgText = formatMultiLabel(rlState.ultg, "Semua ULTG");
       const indukText = formatMultiLabel(rlState.induk, "");
+      const kritText = rlState.kritikal === "ALL" ? "" : ` • Kritikal ${rlState.kritikal}`;
       document.getElementById("rl-filter-badge").textContent =
-        `${jenisLabels[rlState.jenis] || "Semua"} • ${ultgText}${indukText ? " • " + indukText : ""}`;
+        `${jenisLabels[rlState.jenis] || "Semua"} • ${ultgText}${indukText ? " • " + indukText : ""}${kritText}`;
 
       renderRlEquipmentSummary();
 
@@ -5258,6 +5388,7 @@
         const status = tw.upd === 0 ? "BELUM" : (tw.upd >= tw.total ? "LENGKAP" : "SEBAGIAN");
         return {
           ...tw,
+          kritikal: getSegmenKritikal(tw.induk),
           jenisLabel: Array.from(tw.jenisSet).sort().join("+"),
           belum,
           pct,
@@ -5265,7 +5396,29 @@
         };
       });
 
-      const filteredTowers = allTowers.filter(tw => matchRlTowerStatusFilter(tw.status, rlState.towerStatus));
+      const baseTowersByStatus = allTowers.filter(tw => matchRlTowerStatusFilter(tw.status, rlState.towerStatus));
+      const kritMap = new Map(["P0", "P1", "P2", "P3"].map(k => [k, {
+        k, segmenSet: new Set(), total: 0, upd: 0, cek: 0, kos: 0, twLengkap: 0, twSebagian: 0, twBelum: 0
+      }]));
+      for (const tw of baseTowersByStatus) {
+        const km = kritMap.get(tw.kritikal);
+        if (!km) continue;
+        km.segmenSet.add(tw.induk);
+        km.total += tw.total; km.upd += tw.upd; km.cek += tw.cek; km.kos += tw.kos;
+        if (tw.status === "LENGKAP") km.twLengkap++;
+        else if (tw.status === "SEBAGIAN") km.twSebagian++;
+        else km.twBelum++;
+      }
+      const kritList = Array.from(kritMap.values()).map(d => ({
+        ...d,
+        segmenCount: d.segmenSet.size,
+        belum: d.cek + d.kos,
+        pctReal: d.total > 0 ? (d.upd / d.total) * 100 : 0
+      }));
+      renderRlKritikalChart(kritList);
+      renderRlKritikalTable(kritList);
+
+      const filteredTowers = baseTowersByStatus.filter(tw => rlState.kritikal === "ALL" || tw.kritikal === rlState.kritikal);
       filteredTowers.sort((a, b) => {
         const ord = s => s === "BELUM" ? 0 : s === "SEBAGIAN" ? 1 : 2;
         return (ord(a.status) - ord(b.status)) || a.induk.localeCompare(b.induk) || (a.towerNum - b.towerNum) || a.loc.localeCompare(b.loc);
@@ -5284,7 +5437,7 @@
 
         let im = indukMap.get(tw.induk);
         if (!im) {
-          im = { induk: tw.induk, ultg: tw.ultg, total: 0, upd: 0, cek: 0, kos: 0, twTotal: 0, twLengkap: 0, twSebagian: 0, twBelum: 0 };
+          im = { induk: tw.induk, ultg: tw.ultg, kritikal: tw.kritikal, total: 0, upd: 0, cek: 0, kos: 0, twTotal: 0, twLengkap: 0, twSebagian: 0, twBelum: 0 };
           indukMap.set(tw.induk, im);
         }
         im.total += tw.total; im.upd += tw.upd; im.cek += tw.cek; im.kos += tw.kos;
@@ -5342,6 +5495,105 @@
       renderRlIndukChart(currentRlIndukList);
       renderRlMap(filteredTowers);
       renderRlTables();
+    }
+
+    function setRlKritikalFilter(k) {
+      rlState.kritikal = rlState.kritikal === k ? "ALL" : k;
+      rlState.page = 1;
+      document.getElementById("rl-kritikal").value = rlState.kritikal;
+      syncRlKritikalQuickButtons();
+      refreshRlView();
+    }
+
+    function syncRlKritikalQuickButtons() {
+      document.querySelectorAll(".rl-krit-btn").forEach(b => {
+        b.className = b.dataset.rlkrit === rlState.kritikal
+          ? "rl-krit-btn px-2.5 py-1 rounded-xl font-bold bg-rose-500 text-white transition"
+          : "rl-krit-btn px-2.5 py-1 rounded-xl font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
+      });
+    }
+
+    function renderRlKritikalChart(kritList) {
+      const ctx = document.getElementById("chart-rl-kritikal").getContext("2d");
+      if (chartRlKritikal) chartRlKritikal.destroy();
+      chartRlKritikal = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: kritList.map(d => `${d.k} (${d.segmenCount} segmen)`),
+          datasets: [
+            { label: "Sudah Realisasi", data: kritList.map(d => d.upd), backgroundColor: "rgba(16, 185, 129, 0.88)", borderRadius: 4 },
+            { label: "Cek Kembali", data: kritList.map(d => d.cek), backgroundColor: "rgba(245, 158, 11, 0.88)", borderRadius: 4 },
+            { label: "Belum Realisasi (Kosong)", data: kritList.map(d => d.kos), backgroundColor: "rgba(148, 163, 184, 0.55)", borderRadius: 4 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          onClick: (_, elements) => {
+            if (elements && elements.length > 0) {
+              const clicked = kritList[elements[0].index]?.k;
+              if (clicked) setRlKritikalFilter(clicked);
+            }
+          },
+          scales: {
+            x: { stacked: true, grid: { color: "rgba(148, 163, 184, 0.1)" }, ticks: { color: "#e2e8f0", font: { size: 11, weight: "700" } } },
+            y: { stacked: true, beginAtZero: true, grace: "18%", grid: { color: "rgba(148, 163, 184, 0.1)" }, ticks: { color: "#cbd5e1", font: { size: 11 } } }
+          },
+          plugins: {
+            legend: { labels: { color: "#e2e8f0", font: { size: 11, weight: "600" } } },
+            datalabels: {
+              display: ctx => ctx.datasetIndex === 2,
+              anchor: "end", align: "top", font: { size: 10, weight: "700" },
+              formatter: (_, ctx) => {
+                const d = kritList[ctx.dataIndex];
+                if (!d || !d.total) return "0";
+                return `${fmtNum(d.upd)}/${fmtNum(d.total)} (${d.pctReal.toFixed(1)}%)`;
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function renderRlKritikalTable(kritList) {
+      document.getElementById("rl-tbody-kritikal").innerHTML = kritList.map(d => `
+        <tr class="hover:bg-slate-800/40 transition ${rlState.kritikal === d.k ? "bg-rose-500/10" : ""}">
+          <td class="py-2.5 px-2.5">${kritikalBadge(d.k)}</td>
+          <td class="py-2.5 px-2.5 text-right font-semibold">${fmtNum(d.segmenCount)}</td>
+          <td class="py-2.5 px-2.5 text-right font-bold">${fmtNum(d.total)}</td>
+          <td class="py-2.5 px-2.5 text-right font-bold text-emerald-400">${fmtNum(d.upd)}</td>
+          <td class="py-2.5 px-2.5 text-right text-slate-400">${fmtNum(d.belum)}</td>
+          <td class="py-2.5 px-2.5 text-right font-extrabold text-sky-300">${fmtDec(d.pctReal, 1)}%</td>
+          <td class="py-2.5 px-2.5 text-center text-[11px] font-semibold">
+            <span class="text-emerald-300">${fmtNum(d.twLengkap)}</span> /
+            <span class="text-amber-300">${fmtNum(d.twSebagian)}</span> /
+            <span class="text-rose-400">${fmtNum(d.twBelum)}</span>
+          </td>
+          <td class="py-2.5 px-2.5 text-center">
+            <button type="button" onclick="setRlKritikalFilter('${d.k}')"
+              class="px-2 py-1 rounded-lg text-[10px] font-bold ${rlState.kritikal === d.k ? "bg-rose-500 text-white" : "bg-slate-800 hover:bg-rose-500 text-slate-300 hover:text-white"} transition">
+              ${rlState.kritikal === d.k ? "Reset" : "Filter"}
+            </button>
+          </td>
+        </tr>
+      `).join("");
+      const tot = kritList.reduce((a, d) => {
+        a.seg += d.segmenCount; a.total += d.total; a.upd += d.upd; a.belum += d.belum;
+        a.l += d.twLengkap; a.s += d.twSebagian; a.b += d.twBelum;
+        return a;
+      }, { seg: 0, total: 0, upd: 0, belum: 0, l: 0, s: 0, b: 0 });
+      document.getElementById("rl-tfoot-kritikal").innerHTML = `
+        <tr>
+          <td class="py-2 px-2.5">ALL</td>
+          <td class="py-2 px-2.5 text-right">${fmtNum(tot.seg)}</td>
+          <td class="py-2 px-2.5 text-right">${fmtNum(tot.total)}</td>
+          <td class="py-2 px-2.5 text-right text-emerald-400">${fmtNum(tot.upd)}</td>
+          <td class="py-2 px-2.5 text-right text-slate-400">${fmtNum(tot.belum)}</td>
+          <td class="py-2 px-2.5 text-right text-sky-300">${tot.total > 0 ? fmtDec((tot.upd / tot.total) * 100, 1) : "0,0"}%</td>
+          <td class="py-2 px-2.5 text-center text-[11px]">${fmtNum(tot.l)} / ${fmtNum(tot.s)} / ${fmtNum(tot.b)}</td>
+          <td></td>
+        </tr>
+      `;
     }
 
     function renderRlMap(towerList) {
@@ -5595,6 +5847,7 @@
         document.getElementById("rl-tbody-tower").innerHTML = pageRows.map((tw, i) => `
           <tr class="hover:bg-slate-800/40 transition">
             <td class="py-2 px-3 text-slate-400">${startIdx + i + 1}</td>
+            <td class="py-2 px-3">${kritikalBadge(tw.kritikal)}</td>
             <td class="py-2 px-3 text-slate-300">${escapeHtml(tw.ultg)}</td>
             <td class="py-2 px-3 font-medium text-white">${escapeHtml(tw.induk)}</td>
             <td class="py-2 px-3 font-semibold text-slate-200">${escapeHtml(tw.loc)}</td>
@@ -5628,6 +5881,7 @@
         document.getElementById("rl-tbody-induk").innerHTML = indukRows.map((d, i) => `
           <tr class="hover:bg-slate-800/40 transition">
             <td class="py-2 px-3 text-slate-400 font-bold">${i + 1}</td>
+            <td class="py-2 px-3">${kritikalBadge(d.kritikal)}</td>
             <td class="py-2 px-3 font-semibold text-white">${escapeHtml(d.induk)}</td>
             <td class="py-2 px-3 text-slate-300">${escapeHtml(d.ultg)}</td>
             <td class="py-2 px-3 text-right font-bold">${fmtNum(d.total)}</td>
@@ -5654,7 +5908,7 @@
         }, { total: 0, upd: 0, cek: 0, kos: 0, twTotal: 0, twLengkap: 0, twSebagian: 0, twBelum: 0 });
         document.getElementById("rl-tfoot-induk").innerHTML = `
           <tr>
-            <td class="py-2.5 px-3" colspan="3">TOTAL (${fmtNum(indukRows.length)} Penghantar)</td>
+            <td class="py-2.5 px-3" colspan="4">TOTAL (${fmtNum(indukRows.length)} Penghantar)</td>
             <td class="py-2.5 px-3 text-right">${fmtNum(tot.total)}</td>
             <td class="py-2.5 px-3 text-right text-emerald-400">${fmtNum(tot.upd)}</td>
             <td class="py-2.5 px-3 text-right text-amber-300">${fmtNum(tot.cek)}</td>
@@ -6123,16 +6377,27 @@
     document.getElementById("rl-ultg").addEventListener("change", e => { rlState.ultg = e.target.value; rlState.page = 1; populateRlFilters(); refreshRlView(); });
     document.getElementById("rl-induk").addEventListener("change", e => { rlState.induk = e.target.value; rlState.page = 1; refreshRlView(); });
     document.getElementById("rl-tower-status").addEventListener("change", e => { rlState.towerStatus = e.target.value; rlState.page = 1; syncRlTowerQuickButtons(); refreshRlView(); });
+    document.getElementById("rl-kritikal").addEventListener("change", e => { rlState.kritikal = e.target.value; rlState.page = 1; syncRlKritikalQuickButtons(); refreshRlView(); });
     document.getElementById("rl-hide-unmapped").addEventListener("change", e => { rlState.hideUnmapped = e.target.checked; rlState.page = 1; populateRlFilters(); refreshRlView(); });
     document.getElementById("btn-reset-rl").addEventListener("click", () => {
-      rlState.jenis = "ALL"; rlState.ultg = "ALL"; rlState.induk = "ALL"; rlState.towerStatus = "ALL";
+      rlState.jenis = "ALL"; rlState.ultg = "ALL"; rlState.induk = "ALL"; rlState.towerStatus = "ALL"; rlState.kritikal = "ALL";
       rlState.hideUnmapped = false; rlState.search = ""; rlState.page = 1;
       document.getElementById("rl-jenis").value = "ALL";
       document.getElementById("rl-tower-status").value = "ALL";
+      document.getElementById("rl-kritikal").value = "ALL";
       document.getElementById("rl-hide-unmapped").checked = false;
       document.getElementById("rl-search").value = "";
       syncRlTowerQuickButtons();
+      syncRlKritikalQuickButtons();
       populateRlFilters(); refreshRlView();
+    });
+    document.querySelectorAll(".rl-krit-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        rlState.kritikal = btn.dataset.rlkrit; rlState.page = 1;
+        document.getElementById("rl-kritikal").value = rlState.kritikal;
+        syncRlKritikalQuickButtons();
+        refreshRlView();
+      });
     });
     document.querySelectorAll(".rl-sort-btn").forEach(btn => {
       btn.addEventListener("click", () => {
@@ -6535,7 +6800,7 @@
         "ms-year", "ms-month", "ms-ultg", "ms-induk", "ms-st26", "ms-kon",
         "an-year", "an-month", "an-ultg", "an-induk", "an-pst", "an-prio",
         "th-year", "th-month", "th-ultg", "th-induk", "th-pst", "th-kondisi",
-        "rl-jenis", "rl-ultg", "rl-induk", "rl-tower-status"
+        "rl-jenis", "rl-ultg", "rl-induk", "rl-tower-status", "rl-kritikal"
       ];
       ids.forEach((id) => enhanceSearchableSelect(document.getElementById(id)));
       document.addEventListener("click", () => closeAllSearchableSelects());
