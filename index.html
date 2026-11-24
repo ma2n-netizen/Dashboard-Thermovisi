@@ -2341,6 +2341,11 @@
           </div>
         </div>
 
+        <div id="rl-quick-ultg-bar" class="flex flex-wrap items-center gap-1.5 text-xs mb-3 pb-3 border-b border-slate-800/80">
+          <span class="text-slate-400 font-semibold mr-1">Filter Cepat ULTG:</span>
+          <div id="rl-quick-ultg-pills" class="flex flex-wrap items-center gap-1.5"></div>
+        </div>
+
         <div id="rl-quick-tower-bar" class="flex flex-wrap items-center justify-between gap-3 mb-4">
           <div class="flex flex-wrap items-center gap-1.5 text-xs">
             <span class="text-slate-400 font-semibold mr-1">Filter Cepat Tower:</span>
@@ -5098,6 +5103,48 @@
       });
       selI.value = keepValidMulti(prevI, induks);
       rlState.induk = selI.value;
+      renderRlQuickUltgPills(ultgs);
+    }
+
+    function renderRlQuickUltgPills(ultgs) {
+      const wrap = document.getElementById("rl-quick-ultg-pills");
+      if (!wrap) return;
+      const selected = parseMultiVal(rlState.ultg);
+      const mkCls = (active) => active
+        ? "px-3 py-1 rounded-xl font-bold bg-indigo-500 text-white transition"
+        : "px-3 py-1 rounded-xl font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
+
+      wrap.innerHTML = "";
+      const allBtn = document.createElement("button");
+      allBtn.type = "button";
+      allBtn.className = mkCls(selected.length === 0);
+      allBtn.textContent = "Semua ULTG";
+      allBtn.onclick = () => {
+        rlState.ultg = "ALL"; rlState.page = 1;
+        document.getElementById("rl-ultg").value = "ALL";
+        populateRlFilters(); refreshRlView();
+      };
+      wrap.appendChild(allBtn);
+
+      ultgs.forEach(u => {
+        const isOn = selected.includes(u);
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.dataset.rlultg = u;
+        btn.className = mkCls(isOn);
+        btn.textContent = u.replace(/^ULTG\s+/i, "");
+        btn.onclick = () => {
+          const cur = parseMultiVal(rlState.ultg);
+          const idx = cur.indexOf(u);
+          if (idx >= 0) cur.splice(idx, 1);
+          else cur.push(u);
+          rlState.ultg = cur.length ? cur.join("||") : "ALL";
+          rlState.page = 1;
+          document.getElementById("rl-ultg").value = rlState.ultg;
+          populateRlFilters(); refreshRlView();
+        };
+        wrap.appendChild(btn);
+      });
     }
 
     function renderRlEquipmentSummary() {
