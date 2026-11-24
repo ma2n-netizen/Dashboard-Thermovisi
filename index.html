@@ -2130,14 +2130,13 @@
           </div>
           <div>
             <label class="block text-[11px] font-bold uppercase tracking-wider text-rose-400 mb-1.5">🔥 Segmen Kritikal
-              (P0–P3)</label>
+              (P0–P2)</label>
             <select id="rl-kritikal"
               class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-rose-500">
-              <option value="ALL">Semua Kritikal (P0–P3)</option>
+              <option value="ALL">Semua Kritikal (P0–P2)</option>
               <option value="P0">🔴 P0 — Kritis Utama</option>
               <option value="P1">🟠 P1 — Segmen Kritikal 1</option>
               <option value="P2">🟡 P2 — Segmen Kritikal 2</option>
-              <option value="P3">⚪ P3 — Lainnya / Non-Kritis</option>
             </select>
           </div>
         </div>
@@ -2247,11 +2246,11 @@
             <div class="flex items-center gap-2">
               <span class="px-2 py-0.5 text-[10px] font-extrabold uppercase rounded bg-rose-500 text-white">SEGMEN
                 KRITIKAL</span>
-              <h3 class="text-sm lg:text-base font-bold text-white">Grafik Realisasi Per Kategori Kritikal (P0, P1, P2,
-                P3)</h3>
+              <h3 class="text-sm lg:text-base font-bold text-white">Grafik Realisasi Per Kategori Kritikal (P0, P1,
+                P2)</h3>
             </div>
             <p class="text-xs text-slate-400 mt-0.5">Perbandingan Sudah Realisasi vs Belum Realisasi berdasarkan
-              klasifikasi segmen kritikal. <strong class="text-rose-300">Klik batang P0–P3</strong> untuk filter.</p>
+              klasifikasi segmen kritikal. <strong class="text-rose-300">Klik batang P0–P2</strong> untuk filter.</p>
           </div>
           <div class="relative w-full" style="height: 280px;">
             <canvas id="chart-rl-kritikal"></canvas>
@@ -2262,8 +2261,8 @@
           <div class="pb-3 mb-3 border-b border-slate-800">
             <div class="flex items-center gap-2">
               <span class="px-2 py-0.5 text-[10px] font-extrabold uppercase rounded bg-amber-500 text-slate-950">TABEL
-                P0–P3</span>
-              <h3 class="text-sm lg:text-base font-bold text-white">Rekap Realisasi Segmen Kritikal (P0, P1, P2, P3)</h3>
+                P0–P2</span>
+              <h3 class="text-sm lg:text-base font-bold text-white">Rekap Realisasi Segmen Kritikal (P0, P1, P2)</h3>
             </div>
             <p class="text-xs text-slate-400 mt-0.5">Ringkasan jumlah segmen, target titik, realisasi (%), dan status
               tower tiap kategori kritikal.</p>
@@ -2414,7 +2413,6 @@
             <button data-rlkrit="P0" class="rl-krit-btn px-2.5 py-1 rounded-xl font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">P0</button>
             <button data-rlkrit="P1" class="rl-krit-btn px-2.5 py-1 rounded-xl font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">P1</button>
             <button data-rlkrit="P2" class="rl-krit-btn px-2.5 py-1 rounded-xl font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">P2</button>
-            <button data-rlkrit="P3" class="rl-krit-btn px-2.5 py-1 rounded-xl font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">P3</button>
           </div>
         </div>
 
@@ -5178,14 +5176,14 @@
 
     function getSegmenKritikal(induk) {
       const key = normPenghantarKeyJs(induk);
-      return SEGMEN_KRITIKAL_RAW[key] || "P3";
+      return SEGMEN_KRITIKAL_RAW[key] || "-";
     }
 
     function kritikalBadge(k) {
       if (k === "P0") return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-rose-600 text-white">P0</span>`;
       if (k === "P1") return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-orange-500/25 text-orange-300 border border-orange-500/40">P1</span>`;
       if (k === "P2") return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">P2</span>`;
-      return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700/60 text-slate-300 border border-slate-600">P3</span>`;
+      return `<span class="text-slate-500">-</span>`;
     }
 
     function getRlCombinedRecords(jenisOverride = null) {
@@ -5397,7 +5395,7 @@
       });
 
       const baseTowersByStatus = allTowers.filter(tw => matchRlTowerStatusFilter(tw.status, rlState.towerStatus));
-      const kritMap = new Map(["P0", "P1", "P2", "P3"].map(k => [k, {
+      const kritMap = new Map(["P0", "P1", "P2"].map(k => [k, {
         k, segmenSet: new Set(), total: 0, upd: 0, cek: 0, kos: 0, twLengkap: 0, twSebagian: 0, twBelum: 0
       }]));
       for (const tw of baseTowersByStatus) {
