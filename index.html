@@ -1975,20 +1975,20 @@
             </p>
           </div>
           <div class="flex flex-wrap items-center gap-2">
-            <div class="inline-flex items-center rounded-xl bg-slate-900/90 border border-slate-700/80 p-0.5 text-[11px]">
+            <div class="inline-flex items-center rounded-xl bg-slate-800/90 border border-slate-600/80 p-0.5 text-[11px]">
               <button type="button" data-pst="ALL"
                 class="th-combo-pst-btn px-2.5 py-1 rounded-lg font-bold bg-sky-500 text-slate-950 transition">Semua</button>
               <button type="button" data-pst="C1"
-                class="th-combo-pst-btn px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white transition">C1</button>
+                class="th-combo-pst-btn px-2.5 py-1 rounded-lg font-semibold text-slate-100 hover:text-white transition">C1</button>
               <button type="button" data-pst="MJ"
-                class="th-combo-pst-btn px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white transition">MJ</button>
+                class="th-combo-pst-btn px-2.5 py-1 rounded-lg font-semibold text-slate-100 hover:text-white transition">MJ</button>
               <button type="button" data-pst="RS"
-                class="th-combo-pst-btn px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white transition">RS</button>
+                class="th-combo-pst-btn px-2.5 py-1 rounded-lg font-semibold text-slate-100 hover:text-white transition">RS</button>
             </div>
             <button type="button" id="th-combo-hide-unmapped"
-              class="px-2.5 py-1 text-[11px] font-semibold rounded-xl border border-slate-700 bg-slate-900/90 text-slate-300 hover:text-white transition"
+              class="px-2.5 py-1 text-[11px] font-bold rounded-xl border border-amber-500/70 bg-amber-500/20 text-amber-700 dark:text-amber-300 transition"
               title="Sembunyikan/tampilkan data yang belum memiliki mapping ULTG">
-              Sembunyikan Belum Dipetakan
+              ✓ Belum Dipetakan Disembunyikan
             </button>
             <span id="th-ultg-combo-badge"
               class="px-2.5 py-1 text-[11px] font-bold rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/30">
@@ -5028,13 +5028,13 @@
       });
     }
 
-    let thHideUnmappedCombo = false;
+    let thHideUnmappedCombo = true;
     function syncThComboPstButtons() {
       document.querySelectorAll(".th-combo-pst-btn").forEach(btn => {
         const active = btn.dataset.pst === thState.pst;
         btn.className = active
           ? "th-combo-pst-btn px-2.5 py-1 rounded-lg font-bold bg-sky-500 text-slate-950 transition"
-          : "th-combo-pst-btn px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white transition";
+          : "th-combo-pst-btn px-2.5 py-1 rounded-lg font-semibold text-slate-100 hover:text-white transition";
       });
     }
 
@@ -5189,7 +5189,7 @@
               type: "linear",
               position: "left",
               beginAtZero: true,
-              grace: "30%",
+              grace: "45%",
               grid: { color: isPln ? "rgba(15, 23, 42, 0.07)" : "rgba(148, 163, 184, 0.1)" },
               ticks: { color: isPln ? "#475569" : "#cbd5e1", font: { size: 11 } },
               title: { display: true, text: "Jumlah Equipment", color: isPln ? "#475569" : "#94a3b8", font: { size: 11, weight: "600" } }
@@ -6596,8 +6596,8 @@
       thHideUnmappedCombo = !thHideUnmappedCombo;
       e.currentTarget.textContent = thHideUnmappedCombo ? "✓ Belum Dipetakan Disembunyikan" : "Sembunyikan Belum Dipetakan";
       e.currentTarget.className = thHideUnmappedCombo
-        ? "px-2.5 py-1 text-[11px] font-bold rounded-xl border border-amber-500/60 bg-amber-500/20 text-amber-300 transition"
-        : "px-2.5 py-1 text-[11px] font-semibold rounded-xl border border-slate-700 bg-slate-900/90 text-slate-300 hover:text-white transition";
+        ? "px-2.5 py-1 text-[11px] font-bold rounded-xl border border-amber-500/70 bg-amber-500/20 text-amber-700 dark:text-amber-300 transition"
+        : "px-2.5 py-1 text-[11px] font-semibold rounded-xl border border-slate-600 bg-slate-800/90 text-slate-100 hover:text-white transition";
       renderThUltgComboChart();
     });
     document.getElementById("th-kondisi").addEventListener("change", e => { thState.kondisi = e.target.value; thState.page = 1; refreshThermoView(); });
