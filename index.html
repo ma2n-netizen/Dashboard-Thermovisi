@@ -1961,26 +1961,42 @@
         </div>
       </section>
 
-      <!-- GRAFIK KOMBO REALISASI & PERSENTASE TERCAPAI PER ULTG (C1 + MJ + RS) -->
+      <!-- GRAFIK KOMBO REALISASI & PERSENTASE TERCAPAI PER ULTG -->
       <section class="glass-card rounded-2xl p-5 shadow-xl">
-        <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-800">
+        <div class="flex flex-wrap items-center justify-between gap-3 pb-3 mb-3 border-b border-slate-800">
           <div>
             <div class="flex items-center gap-2">
               <span class="px-2 py-0.5 text-[10px] font-extrabold uppercase rounded bg-sky-500 text-slate-950">GRAFIK
                 ULTG • 3 PERALATAN</span>
-              <h3 class="text-sm lg:text-base font-bold text-white">Total Equipment, Realisasi &amp; Persentase Tercapai
-                Per ULTG (C1 + MJ + RS)</h3>
+              <h3 class="text-sm lg:text-base font-bold text-white">Target, Realisasi &amp; Persentase Tercapai
+                Per ULTG</h3>
             </div>
-            <p class="text-xs text-slate-400 mt-0.5">Perbandingan jumlah equipment (Dead End C1, Midspan MJ, Repair
-              Sleeve RS), realisasi 3 peralatan, dan garis persentase tercapai (%) per ULTG (klik batang untuk filter).
+            <p class="text-xs text-slate-400 mt-0.5">Perbandingan Target vs Realisasi equipment (C1, MJ, RS) dan garis % Tercapai per ULTG (klik batang untuk filter).
             </p>
           </div>
-          <span id="th-ultg-combo-badge"
-            class="px-2.5 py-1 text-[11px] font-bold rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/30">
-            Total: 0 / 0 (0%)
-          </span>
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="inline-flex items-center rounded-xl bg-slate-900/90 border border-slate-700/80 p-0.5 text-[11px]">
+              <button type="button" data-pst="ALL"
+                class="th-combo-pst-btn px-2.5 py-1 rounded-lg font-bold bg-sky-500 text-slate-950 transition">Semua</button>
+              <button type="button" data-pst="C1"
+                class="th-combo-pst-btn px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white transition">C1</button>
+              <button type="button" data-pst="MJ"
+                class="th-combo-pst-btn px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white transition">MJ</button>
+              <button type="button" data-pst="RS"
+                class="th-combo-pst-btn px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white transition">RS</button>
+            </div>
+            <button type="button" id="th-combo-hide-unmapped"
+              class="px-2.5 py-1 text-[11px] font-semibold rounded-xl border border-slate-700 bg-slate-900/90 text-slate-300 hover:text-white transition"
+              title="Sembunyikan/tampilkan data yang belum memiliki mapping ULTG">
+              Sembunyikan (-)
+            </button>
+            <span id="th-ultg-combo-badge"
+              class="px-2.5 py-1 text-[11px] font-bold rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/30">
+              Total: 0 / 0 (0%)
+            </span>
+          </div>
         </div>
-        <div class="relative w-full" style="height: 340px;">
+        <div class="relative w-full" style="height: 360px;">
           <canvas id="chart-th-ultg-combo"></canvas>
         </div>
       </section>
@@ -5012,7 +5028,18 @@
       });
     }
 
+    let thHideUnmappedCombo = false;
+    function syncThComboPstButtons() {
+      document.querySelectorAll(".th-combo-pst-btn").forEach(btn => {
+        const active = btn.dataset.pst === thState.pst;
+        btn.className = active
+          ? "th-combo-pst-btn px-2.5 py-1 rounded-lg font-bold bg-sky-500 text-slate-950 transition"
+          : "th-combo-pst-btn px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white transition";
+      });
+    }
+
     function renderThUltgComboChart() {
+      syncThComboPstButtons();
       const pst = thState.pst;
       const allEquip = [];
       if (pst === "ALL" || pst === "C1") {
@@ -5031,6 +5058,7 @@
       for (const r of allEquip) {
         if (!matchMulti(thState.ultg, r.u)) continue;
         if (!matchMulti(thState.induk, r.i)) continue;
+        if (thHideUnmappedCombo && !r.u) continue;
         const uKey = r.u || "(Belum Dipetakan)";
         let u = uMap.get(uKey);
         if (!u) {
@@ -5051,8 +5079,12 @@
 
       const grandPct = grandTot > 0 ? ((grandUpd / grandTot) * 100).toFixed(1) : "0.0";
       const badgeEl = document.getElementById("th-ultg-combo-badge");
-      if (badgeEl) badgeEl.textContent = `Realisasi 3 Peralatan: ${fmtNum(grandUpd)} / ${fmtNum(grandTot)} (${grandPct}%)`;
+      if (badgeEl) {
+        const pstLabel = pst === "ALL" ? "3 Peralatan" : pst;
+        badgeEl.textContent = `Realisasi ${pstLabel}: ${fmtNum(grandUpd)} / ${fmtNum(grandTot)} (${grandPct}%)`;
+      }
 
+      const isPln = document.body.classList.contains("theme-pln");
       const ctx = document.getElementById("chart-th-ultg-combo").getContext("2d");
       if (chartThUltgCombo) chartThUltgCombo.destroy();
       chartThUltgCombo = new Chart(ctx, {
@@ -5068,25 +5100,68 @@
               borderColor: "#0ea5e9",
               backgroundColor: "#0ea5e9",
               borderWidth: 3,
-              pointRadius: 5,
-              pointBackgroundColor: "#0ea5e9",
-              tension: 0.25
+              pointRadius: 5.5,
+              pointHoverRadius: 7,
+              pointBackgroundColor: "#ffffff",
+              pointBorderColor: "#0284c7",
+              pointBorderWidth: 2.5,
+              tension: 0.28,
+              datalabels: {
+                display: true,
+                anchor: "end",
+                align: "top",
+                offset: 6,
+                color: "#ffffff",
+                backgroundColor: "#0284c7",
+                borderRadius: 6,
+                padding: { top: 2, bottom: 2, left: 6, right: 6 },
+                font: { size: 10.5, weight: "700" },
+                formatter: v => `${v}%`
+              }
             },
             {
               type: "bar",
-              label: "Total Equipment (C1 + MJ + RS)",
+              label: "Target",
               data: entries.map(d => d.tot),
               yAxisID: "y",
-              backgroundColor: "rgba(99, 102, 241, 0.78)",
-              borderRadius: 5
+              backgroundColor: "rgba(99, 102, 241, 0.85)",
+              borderColor: "#4f46e5",
+              borderWidth: 1,
+              borderRadius: 6,
+              borderSkipped: false,
+              barPercentage: 0.78,
+              categoryPercentage: 0.68,
+              datalabels: {
+                display: true,
+                anchor: "end",
+                align: "top",
+                offset: 2,
+                color: isPln ? "#312e81" : "#c7d2fe",
+                font: { size: 10, weight: "700" },
+                formatter: v => fmtNum(v)
+              }
             },
             {
               type: "bar",
-              label: "Jumlah Realisasi (C1 + MJ + RS)",
+              label: "Realisasi",
               data: entries.map(d => d.upd),
               yAxisID: "y",
-              backgroundColor: "rgba(16, 185, 129, 0.85)",
-              borderRadius: 5
+              backgroundColor: "rgba(16, 185, 129, 0.90)",
+              borderColor: "#059669",
+              borderWidth: 1,
+              borderRadius: 6,
+              borderSkipped: false,
+              barPercentage: 0.78,
+              categoryPercentage: 0.68,
+              datalabels: {
+                display: true,
+                anchor: "end",
+                align: "top",
+                offset: 2,
+                color: isPln ? "#065f46" : "#6ee7b7",
+                font: { size: 10, weight: "700" },
+                formatter: v => fmtNum(v)
+              }
             }
           ]
         },
@@ -5106,28 +5181,38 @@
             }
           },
           scales: {
-            x: { grid: { color: "rgba(148, 163, 184, 0.1)" }, ticks: { color: "#e2e8f0", font: { size: 11, weight: "600" } } },
+            x: {
+              grid: { display: false },
+              ticks: { color: isPln ? "#1e293b" : "#e2e8f0", font: { size: 11, weight: "700" } }
+            },
             y: {
               type: "linear",
               position: "left",
               beginAtZero: true,
-              grace: "15%",
-              grid: { color: "rgba(148, 163, 184, 0.1)" },
-              ticks: { color: "#cbd5e1", font: { size: 11 } },
-              title: { display: true, text: "Jumlah Equipment", color: "#94a3b8", font: { size: 11, weight: "600" } }
+              grace: "22%",
+              grid: { color: isPln ? "rgba(15, 23, 42, 0.07)" : "rgba(148, 163, 184, 0.1)" },
+              ticks: { color: isPln ? "#475569" : "#cbd5e1", font: { size: 11 } },
+              title: { display: true, text: "Jumlah Equipment", color: isPln ? "#475569" : "#94a3b8", font: { size: 11, weight: "600" } }
             },
             y1: {
               type: "linear",
               position: "right",
               min: 0,
-              max: 115,
+              max: 120,
               grid: { drawOnChartArea: false },
-              ticks: { color: "#0ea5e9", font: { size: 11, weight: "600" }, callback: v => v <= 100 ? `${v}%` : "" },
-              title: { display: true, text: "% Tercapai", color: "#0ea5e9", font: { size: 11, weight: "600" } }
+              ticks: { color: "#0284c7", font: { size: 11, weight: "600" }, callback: v => v <= 100 ? `${v}%` : "" },
+              title: { display: true, text: "% Tercapai", color: "#0284c7", font: { size: 11, weight: "600" } }
             }
           },
           plugins: {
-            legend: { labels: { color: "#e2e8f0", font: { size: 11, weight: "600" } } },
+            legend: {
+              labels: {
+                color: isPln ? "#1e293b" : "#e2e8f0",
+                font: { size: 11.5, weight: "600" },
+                usePointStyle: true,
+                padding: 16
+              }
+            },
             tooltip: {
               callbacks: {
                 afterBody: (items) => {
@@ -5143,14 +5228,6 @@
                   ];
                 }
               }
-            },
-            datalabels: {
-              display: ctx => ctx.datasetIndex === 0,
-              anchor: "end",
-              align: "top",
-              offset: 3,
-              font: { size: 10.5, weight: "700" },
-              formatter: v => `${v}%`
             }
           }
         }
@@ -6501,6 +6578,21 @@
     document.getElementById("th-ultg").addEventListener("change", e => { thState.ultg = e.target.value; thState.page = 1; populateThermoFilters(); refreshThermoView(); });
     document.getElementById("th-induk").addEventListener("change", e => { thState.induk = e.target.value; thState.page = 1; refreshThermoView(); });
     document.getElementById("th-pst").addEventListener("change", e => { thState.pst = e.target.value; thState.page = 1; refreshThermoView(); });
+    document.querySelectorAll(".th-combo-pst-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        thState.pst = btn.dataset.pst;
+        thState.page = 1;
+        document.getElementById("th-pst").value = thState.pst;
+        refreshThermoView();
+      });
+    });
+    document.getElementById("th-combo-hide-unmapped").addEventListener("click", e => {
+      thHideUnmappedCombo = !thHideUnmappedCombo;
+      e.currentTarget.className = thHideUnmappedCombo
+        ? "px-2.5 py-1 text-[11px] font-bold rounded-xl border border-amber-500/60 bg-amber-500/20 text-amber-300 transition"
+        : "px-2.5 py-1 text-[11px] font-semibold rounded-xl border border-slate-700 bg-slate-900/90 text-slate-300 hover:text-white transition";
+      renderThUltgComboChart();
+    });
     document.getElementById("th-kondisi").addEventListener("change", e => { thState.kondisi = e.target.value; thState.page = 1; refreshThermoView(); });
     document.getElementById("btn-reset-th").addEventListener("click", () => {
       thState.year = "ALL"; thState.month = "ALL"; thState.ultg = "ALL"; thState.induk = "ALL"; thState.pst = "ALL"; thState.kondisi = "ALL"; thState.search = ""; thState.page = 1;
