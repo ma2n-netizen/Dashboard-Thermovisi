@@ -1988,7 +1988,7 @@
             <button type="button" id="th-combo-hide-unmapped"
               class="px-2.5 py-1 text-[11px] font-semibold rounded-xl border border-slate-700 bg-slate-900/90 text-slate-300 hover:text-white transition"
               title="Sembunyikan/tampilkan data yang belum memiliki mapping ULTG">
-              Sembunyikan (-)
+              Sembunyikan Belum Dipetakan
             </button>
             <span id="th-ultg-combo-badge"
               class="px-2.5 py-1 text-[11px] font-bold rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/30">
@@ -5058,8 +5058,8 @@
       for (const r of allEquip) {
         if (!matchMulti(thState.ultg, r.u)) continue;
         if (!matchMulti(thState.induk, r.i)) continue;
-        if (thHideUnmappedCombo && !r.u) continue;
         const uKey = r.u || "(Belum Dipetakan)";
+        if (thHideUnmappedCombo && (uKey === "(Belum Dipetakan)" || uKey === "-")) continue;
         let u = uMap.get(uKey);
         if (!u) {
           u = { ultg: uKey, tot: 0, upd: 0, c1Tot: 0, c1Upd: 0, mjTot: 0, mjUpd: 0, rsTot: 0, rsUpd: 0 };
@@ -5189,7 +5189,7 @@
               type: "linear",
               position: "left",
               beginAtZero: true,
-              grace: "22%",
+              grace: "30%",
               grid: { color: isPln ? "rgba(15, 23, 42, 0.07)" : "rgba(148, 163, 184, 0.1)" },
               ticks: { color: isPln ? "#475569" : "#cbd5e1", font: { size: 11 } },
               title: { display: true, text: "Jumlah Equipment", color: isPln ? "#475569" : "#94a3b8", font: { size: 11, weight: "600" } }
@@ -6588,6 +6588,7 @@
     });
     document.getElementById("th-combo-hide-unmapped").addEventListener("click", e => {
       thHideUnmappedCombo = !thHideUnmappedCombo;
+      e.currentTarget.textContent = thHideUnmappedCombo ? "✓ Belum Dipetakan Disembunyikan" : "Sembunyikan Belum Dipetakan";
       e.currentTarget.className = thHideUnmappedCombo
         ? "px-2.5 py-1 text-[11px] font-bold rounded-xl border border-amber-500/60 bg-amber-500/20 text-amber-300 transition"
         : "px-2.5 py-1 text-[11px] font-semibold rounded-xl border border-slate-700 bg-slate-900/90 text-slate-300 hover:text-white transition";
