@@ -2843,14 +2843,79 @@
       return m ? parseInt(m[1], 10) : 999999;
     }
 
+    const NON_ANOMALI_KONDISI = new Set(["", "BAIK", "NO DATA", "BELUM UJI", "-"]);
+
     function isAnomaliKondisi(k) {
-      return k === "PERIKSA SAAT HAR" || k === "PERBAIKI < 3 BLN";
+      const s = String(k || "").trim().toUpperCase();
+      return Boolean(s) && !NON_ANOMALI_KONDISI.has(s);
+    }
+
+    function isPerbaikiKondisi(k) {
+      const s = String(k || "").trim().toUpperCase();
+      return isAnomaliKondisi(s) && (s.includes("PERBAIKI") || s.includes("DARURAT") || s.includes("SEGERA") || s.includes("P0"));
+    }
+
+    function konRank(k) {
+      if (isPerbaikiKondisi(k)) return 4;
+      if (isAnomaliKondisi(k)) return 3;
+      if (k === "BAIK") return 2;
+      if (k === "NO DATA") return 1;
+      return 0;
+    }
+
+    function getAnomaliCategories(records, field = "k") {
+      const cats = Array.from(new Set(records.map(r => String(r[field] || "").trim()).filter(isAnomaliKondisi)));
+      const prioOrder = ["PERBAIKI < 1 BLN", "PERBAIKI < 3 BLN", "PERIKSA SAAT HAR"];
+      return cats.sort((a, b) => {
+        const ia = prioOrder.indexOf(a);
+        const ib = prioOrder.indexOf(b);
+        if (ia !== -1 || ib !== -1) return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+        return a.localeCompare(b);
+      });
+    }
+
+    function populateKondisiDropdown(selectId, records, field, mode, prevVal) {
+      const sel = document.getElementById(selectId);
+      if (!sel) return prevVal;
+      const cats = getAnomaliCategories(records, field);
+      const hasNoData = records.some(r => r[field] === "NO DATA");
+      const hasBelum = records.some(r => r[field] === "BELUM UJI");
+      const opts = [];
+      if (mode === "anomali_prio") {
+        opts.push({ v: "ALL", t: "Semua Anomali (Semua Kategori)" });
+        cats.forEach(c => opts.push({ v: c, t: `${isPerbaikiKondisi(c) ? "🔥" : "⚠️"} ${c}` }));
+        opts.push({ v: "TEMP_50", t: "🌡️ Suhu Objek ≥ 50 °C" });
+        opts.push({ v: "DT_10", t: "📈 Delta T (ΔT) ≥ 10 °C" });
+      } else {
+        opts.push({ v: "ALL", t: "Semua Kondisi" });
+        opts.push({ v: "BAIK", t: "✅ BAIK" });
+        opts.push({ v: "ANOMALI", t: "🚨 Semua Anomali" });
+        cats.forEach(c => opts.push({ v: c, t: `${isPerbaikiKondisi(c) ? "🔥" : "⚠️"} ${c}` }));
+        if (hasNoData || selectId === "de-kon" || selectId === "ms-kon" || selectId === "th-kondisi") {
+          opts.push({ v: "NO DATA", t: "🔘 NO DATA" });
+        }
+        if (hasBelum || selectId === "de-kon" || selectId === "ms-kon") {
+          opts.push({ v: "BELUM UJI", t: "⚪ BELUM UJI" });
+        }
+      }
+      sel.innerHTML = "";
+      opts.forEach(o => {
+        const opt = document.createElement("option");
+        opt.value = o.v;
+        opt.textContent = o.t;
+        sel.appendChild(opt);
+      });
+      const valid = opts.some(o => o.v === prevVal) ? prevVal : "ALL";
+      sel.value = valid;
+      return valid;
     }
 
     function kondisiBadge(k) {
       if (k === "BAIK") return `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">BAIK</span>`;
       if (k === "PERIKSA SAAT HAR") return `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">PERIKSA SAAT HAR</span>`;
       if (k === "PERBAIKI < 3 BLN") return `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">PERBAIKI &lt; 3 BLN</span>`;
+      if (isPerbaikiKondisi(k)) return `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">${escapeHtml(k)}</span>`;
+      if (isAnomaliKondisi(k)) return `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">${escapeHtml(k)}</span>`;
       if (k === "NO DATA") return `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">NO DATA</span>`;
       return `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-700/60 text-slate-300 border border-slate-600">BELUM UJI</span>`;
     }
@@ -3326,6 +3391,8 @@
       });
       selI.value = keepValidMulti(prevI, induks);
       deState.induk = selI.value;
+
+      deState.kon = populateKondisiDropdown("de-kon", allDeadEndRecords, "kon", "kondisi", deState.kon);
     }
 
     function getFilteredDeRecords(ignoreMonth = false) {
@@ -3366,8 +3433,8 @@
         else kos++;
 
         if (r.kon === "BAIK") baik++;
-        else if (r.kon === "PERIKSA SAAT HAR") har++;
-        else if (r.kon === "PERBAIKI < 3 BLN") perbaiki++;
+        else if (isPerbaikiKondisi(r.kon)) perbaiki++;
+        else if (isAnomaliKondisi(r.kon)) har++;
         else if (r.kon === "NO DATA") nodata++;
         else belum++;
 
@@ -3385,8 +3452,8 @@
         else im.kos++;
 
         if (r.kon === "BAIK") im.baik++;
-        else if (r.kon === "PERIKSA SAAT HAR") im.har++;
-        else if (r.kon === "PERBAIKI < 3 BLN") im.perbaiki++;
+        else if (isPerbaikiKondisi(r.kon)) im.perbaiki++;
+        else if (isAnomaliKondisi(r.kon)) im.har++;
         else if (r.kon === "NO DATA") im.nodata++;
         else im.belum++;
         if (r.tobj !== null && (im.maxTemp === null || r.tobj > im.maxTemp)) im.maxTemp = r.tobj;
@@ -3400,8 +3467,8 @@
           }
           lm.total++;
           if (r.kon === "BAIK") lm.baik++;
-          else if (r.kon === "PERIKSA SAAT HAR") { lm.har++; lm.anomali++; }
-          else if (r.kon === "PERBAIKI < 3 BLN") { lm.perbaiki++; lm.anomali++; }
+          else if (isPerbaikiKondisi(r.kon)) { lm.perbaiki++; lm.anomali++; }
+          else if (isAnomaliKondisi(r.kon)) { lm.har++; lm.anomali++; }
           if (r.tobj !== null && (lm.maxTemp === null || r.tobj > lm.maxTemp)) lm.maxTemp = r.tobj;
           if (r.dt_val !== null && (lm.maxDt === null || r.dt_val > lm.maxDt)) lm.maxDt = r.dt_val;
           if (lm.lat === null && r.lat !== null) lm.lat = r.lat;
@@ -3985,6 +4052,8 @@
       });
       selI.value = keepValidMulti(prevI, induks);
       msState.induk = selI.value;
+
+      msState.kon = populateKondisiDropdown("ms-kon", allMidspanRecords, "kon", "kondisi", msState.kon);
     }
 
     function getFilteredMsRecords(ignoreMonth = false) {
@@ -4028,8 +4097,8 @@
         else kos++;
 
         if (r.kon === "BAIK") baik++;
-        else if (r.kon === "PERIKSA SAAT HAR") har++;
-        else if (r.kon === "PERBAIKI < 3 BLN") perbaiki++;
+        else if (isPerbaikiKondisi(r.kon)) perbaiki++;
+        else if (isAnomaliKondisi(r.kon)) har++;
 
         if (r.prio === "P0") p0++;
         else if (r.prio === "P1") p1++;
@@ -4046,8 +4115,8 @@
         if (r.k === "MJ") im.mj++; else if (r.k === "RS") im.rs++;
         if (r.st26 === "Data Update") im.upd++; else if (r.st26 === "Cek Kembali") im.cek++; else im.kos++;
         if (r.kon === "BAIK") im.baik++;
-        else if (r.kon === "PERIKSA SAAT HAR") { im.har++; im.anomali++; }
-        else if (r.kon === "PERBAIKI < 3 BLN") { im.perbaiki++; im.anomali++; }
+        else if (isPerbaikiKondisi(r.kon)) { im.perbaiki++; im.anomali++; }
+        else if (isAnomaliKondisi(r.kon)) { im.har++; im.anomali++; }
         else if (r.kon === "NO DATA") im.nodata++;
         else im.belum++;
         if (r.prio === "P0" || r.prio === "P1" || r.prio === "P2") im.prioCnt++;
@@ -4070,8 +4139,8 @@
           if (r.k === "MJ") sm.mj++; else if (r.k === "RS") sm.rs++;
           if (r.st26 === "Data Update") sm.upd++;
           if (r.kon === "BAIK") sm.baik++;
-          else if (r.kon === "PERIKSA SAAT HAR") sm.har++;
-          else if (r.kon === "PERBAIKI < 3 BLN") sm.perbaiki++;
+          else if (isPerbaikiKondisi(r.kon)) sm.perbaiki++;
+          else if (isAnomaliKondisi(r.kon)) sm.har++;
           if (r.tobj !== null && r.tobj > sm.maxTemp) sm.maxTemp = r.tobj;
           if (r.dt_val !== null && r.dt_val > sm.maxDt) sm.maxDt = r.dt_val;
           if ((r.ts || 0) > sm.maxTs) sm.maxTs = r.ts || 0;
@@ -4585,6 +4654,8 @@
       induks.forEach(ind => { const o = document.createElement("option"); o.value = ind; o.textContent = ind; selInduk.appendChild(o); });
       selInduk.value = keepValidMulti(prevInduk, induks);
       anState.induk = selInduk.value;
+
+      anState.prio = populateKondisiDropdown("an-prio", anomAll, "k", "anomali_prio", anState.prio);
     }
 
     function getFilteredAnomaliRecords(ignoreMonth = false) {
@@ -4595,10 +4666,9 @@
         if (!matchMulti(anState.ultg, r.u)) return false;
         if (!matchMulti(anState.induk, r.i)) return false;
         if (anState.pst !== "ALL" && r.pst !== anState.pst) return false;
-        if (anState.prio === "PERBAIKI < 3 BLN" && r.k !== "PERBAIKI < 3 BLN") return false;
-        if (anState.prio === "PERIKSA SAAT HAR" && r.k !== "PERIKSA SAAT HAR") return false;
-        if (anState.prio === "TEMP_50" && (r.tobj === null || r.tobj < 50)) return false;
-        if (anState.prio === "DT_10" && (r.dt_val === null || r.dt_val < 10)) return false;
+        if (anState.prio === "TEMP_50") { if (r.tobj === null || r.tobj < 50) return false; }
+        else if (anState.prio === "DT_10") { if (r.dt_val === null || r.dt_val < 10) return false; }
+        else if (anState.prio !== "ALL" && r.k !== anState.prio) return false;
         return true;
       });
     }
@@ -4617,14 +4687,14 @@
 
       for (const r of filtered) {
         if (r.pst === "C1") c1++; else if (r.pst === "MJ") mj++; else if (r.pst === "RS") rs++;
-        if (r.k === "PERBAIKI < 3 BLN") perbaiki++; else har++;
+        if (isPerbaikiKondisi(r.k)) perbaiki++; else har++;
         if (r.tobj !== null && r.tobj > maxTemp) maxTemp = r.tobj;
         if (r.dt_val !== null && r.dt_val > maxDt) maxDt = r.dt_val;
 
         let im = indukMap.get(r.i);
         if (!im) { im = { induk: r.i, ultg: r.u, har: 0, perbaiki: 0, total: 0 }; indukMap.set(r.i, im); }
         im.total++;
-        if (r.k === "PERBAIKI < 3 BLN") im.perbaiki++; else im.har++;
+        if (isPerbaikiKondisi(r.k)) im.perbaiki++; else im.har++;
 
         const lKey = `${r.i}||${r.loc}`;
         let lm = locMap.get(lKey);
@@ -4633,7 +4703,7 @@
         lm.pstSet.add(r.pst);
         if (r.dt && (!lm.dt || r.dt > lm.dt)) lm.dt = r.dt;
         if (r.ph || r.ln) lm.phLines.add(`${r.ph || "-"}/${r.ln || "-"}`);
-        if (r.k === "PERBAIKI < 3 BLN") lm.perbaiki++; else lm.har++;
+        if (isPerbaikiKondisi(r.k)) lm.perbaiki++; else lm.har++;
         if (r.tobj !== null && (lm.maxTemp === null || r.tobj > lm.maxTemp)) lm.maxTemp = r.tobj;
         if (r.dt_val !== null && (lm.maxDt === null || r.dt_val > lm.maxDt)) lm.maxDt = r.dt_val;
       }
@@ -4693,7 +4763,7 @@
         if (!r.ym) continue;
         let o = ymMap.get(r.ym);
         if (!o) { o = { ym: r.ym, y: r.y, m: r.m, perbaiki: 0, har: 0 }; ymMap.set(r.ym, o); }
-        if (r.k === "PERBAIKI < 3 BLN") o.perbaiki++; else o.har++;
+        if (isPerbaikiKondisi(r.k)) o.perbaiki++; else o.har++;
       }
       const sortedYm = Array.from(ymMap.values()).sort((a, b) => a.ym.localeCompare(b.ym));
       const ctx2 = document.getElementById("chart-an-trend").getContext("2d");
@@ -4755,7 +4825,7 @@
 
       const detailRows = [...filtered]
         .filter(r => !q || r.loc.toLowerCase().includes(q) || r.induk.toLowerCase().includes(q) || r.id.toLowerCase().includes(q) || r.cat.toLowerCase().includes(q))
-        .sort((a, b) => ((a.k === "PERBAIKI < 3 BLN" ? 0 : 1) - (b.k === "PERBAIKI < 3 BLN" ? 0 : 1)) || ((b.tobj || 0) - (a.tobj || 0)));
+        .sort((a, b) => ((isPerbaikiKondisi(a.k) ? 0 : 1) - (isPerbaikiKondisi(b.k) ? 0 : 1)) || ((b.tobj || 0) - (a.tobj || 0)));
       document.getElementById("an-count-detail").textContent = fmtNum(detailRows.length);
       document.getElementById("an-tbody-detail").innerHTML = detailRows.slice(0, 600).map((r, i) => `
         <tr class="hover:bg-slate-800/40 transition">
@@ -4848,6 +4918,8 @@
       induks.forEach(ind => { const o = document.createElement("option"); o.value = ind; o.textContent = ind; selInduk.appendChild(o); });
       selInduk.value = keepValidMulti(prevInduk, induks);
       thState.induk = selInduk.value;
+
+      thState.kondisi = populateKondisiDropdown("th-kondisi", allThermoRecords, "k", "kondisi", thState.kondisi);
     }
 
     function getFilteredThermoRecords(ignoreMonth = false) {
@@ -4879,7 +4951,7 @@
 
       for (const r of filtered) {
         if (r.pst === "C1") c1++; else if (r.pst === "MJ") mj++; else if (r.pst === "RS") rs++;
-        if (r.k === "BAIK") baik++; else if (r.k === "PERIKSA SAAT HAR") har++; else if (r.k === "PERBAIKI < 3 BLN") perbaiki++; else nodata++;
+        if (r.k === "BAIK") baik++; else if (isPerbaikiKondisi(r.k)) perbaiki++; else if (isAnomaliKondisi(r.k)) har++; else nodata++;
         if (r.tobj !== null && r.tobj > maxTemp) { maxTemp = r.tobj; maxTempLoc = `${r.loc} (${r.pst})`; }
         if (r.dt_val !== null && r.dt_val > maxDt) maxDt = r.dt_val;
 
@@ -4887,7 +4959,7 @@
         if (!im) { im = { induk: r.i, ultg: r.u, c1: 0, mj: 0, rs: 0, total: 0, baik: 0, har: 0, perbaiki: 0, nodata: 0, anomali: 0, maxTemp: null, maxDt: null }; indukMap.set(r.i, im); }
         im.total++;
         if (r.pst === "C1") im.c1++; else if (r.pst === "MJ") im.mj++; else if (r.pst === "RS") im.rs++;
-        if (r.k === "BAIK") im.baik++; else if (r.k === "PERIKSA SAAT HAR") { im.har++; im.anomali++; } else if (r.k === "PERBAIKI < 3 BLN") { im.perbaiki++; im.anomali++; } else im.nodata++;
+        if (r.k === "BAIK") im.baik++; else if (isPerbaikiKondisi(r.k)) { im.perbaiki++; im.anomali++; } else if (isAnomaliKondisi(r.k)) { im.har++; im.anomali++; } else im.nodata++;
         if (r.tobj !== null && (im.maxTemp === null || r.tobj > im.maxTemp)) im.maxTemp = r.tobj;
         if (r.dt_val !== null && (im.maxDt === null || r.dt_val > im.maxDt)) im.maxDt = r.dt_val;
 
@@ -5623,7 +5695,6 @@
         else tw.kos++;
         if (r.dt && r.dt > tw.lastDt) tw.lastDt = r.dt;
         if (r.tobj !== null && (tw.maxTemp === null || r.tobj > tw.maxTemp)) tw.maxTemp = r.tobj;
-        const konRank = k => k === "PERBAIKI < 3 BLN" ? 4 : k === "PERIKSA SAAT HAR" ? 3 : k === "BAIK" ? 2 : k === "NO DATA" ? 1 : 0;
         if (konRank(r.kon) > konRank(tw.worstKon)) tw.worstKon = r.kon;
         tw.records.push(r);
       }
